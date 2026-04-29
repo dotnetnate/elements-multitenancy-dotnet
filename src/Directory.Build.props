@@ -1,0 +1,66 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- Override the version MSTest.Sdk/4.2.1 would pin (18.3.0).
+         MSTest.Sdk Sdk.props sets MicrosoftNETTestSdkVersion only when empty,
+         so declaring it here (Directory.Build.props runs first) takes precedence. -->
+    <MicrosoftNETTestSdkVersion>18.4.0</MicrosoftNETTestSdkVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ElementsProductName>MultiTenancy</ElementsProductName>
+    <ElementsCoreReferenceMode Condition="'$(ElementsCoreReferenceMode)' == ''">Project</ElementsCoreReferenceMode>
+    <ElementsCoreRoot Condition="'$(ElementsCoreRoot)' == ''">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\\..\\elements-core-dotnet\\src'))</ElementsCoreRoot>
+    <ElementsCorePackageVersion Condition="'$(ElementsCorePackageVersion)' == ''">0.1.*</ElementsCorePackageVersion>
+
+    <!-- Unified versioning - all components can be overridden via command line or build agent -->
+    <!-- Examples: 
+         dotnet pack /p:VersionMajor=2
+         dotnet pack /p:Version=2.0.0
+         dotnet pack /p:PackageVersionMetadata=release-12345
+    -->
+    
+    <!-- Assembly version components (defaults) -->
+    <VersionMajor Condition="'$(VersionMajor)' == ''">0</VersionMajor>
+    <VersionMinor Condition="'$(VersionMinor)' == ''">1</VersionMinor>
+    <VersionPatch Condition="'$(VersionPatch)' == ''">0</VersionPatch>
+    
+    <!-- Computed assembly version (can be overridden entirely) -->
+    <Version Condition="'$(Version)' == ''">$(VersionMajor).$(VersionMinor).$(VersionPatch)</Version>
+    
+    <!-- Package version metadata (defaults to dev-{timestamp}, can be overridden) -->
+    <UnixEpochTicks Condition="'$(UnixEpochTicks)' == ''">621355968000000000</UnixEpochTicks>
+    <UnixTimestamp Condition="'$(UnixTimestamp)' == ''">$([MSBuild]::Divide($([MSBuild]::Subtract($([System.DateTime]::UtcNow.Ticks), $(UnixEpochTicks))), 10000000))</UnixTimestamp>
+    <PackageVersionMetadata Condition="'$(PackageVersionMetadata)' == ''">multitenancy-dev-$(UnixTimestamp)</PackageVersionMetadata>
+    
+    <!-- NuGet package version (can be overridden entirely) -->
+    <PackageVersion Condition="'$(PackageVersion)' == ''">$(Version)+$(PackageVersionMetadata)</PackageVersion>
+    
+    <!-- NuGet package metadata shared across all packable projects -->
+    <Authors>MyOrg</Authors>
+    <Company>MyOrg</Company>
+    <Copyright>Copyright © MyOrg $([System.DateTime]::Now.Year)</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
+    <Product>Elements.MultiTenancy</Product>
+
+    <!-- All projects are packable by default; tests and exes are excluded in Directory.Build.targets -->
+    <IsPackable>true</IsPackable>
+
+    <!-- PackageReadmeFile is set dynamically in Directory.Build.targets during pack -->
+  </PropertyGroup>
+
+  <!--
+    XML documentation generation for non-test projects.
+    Emits <project>/bin/docs/docs.xml on every build. The doc-gen agent consumes these files.
+    Transitive package XML is intentionally NOT copied to output — we only publish the
+    current assembly's compiler-generated XML documentation.
+  -->
+  <PropertyGroup Condition="!$(MSBuildProjectName.Contains('.Tests.'))">
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>$(MSBuildProjectDirectory)/bin/docs/docs.xml</DocumentationFile>
+    <!-- Do not fail/warn on missing XML comments. -->
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+</Project>

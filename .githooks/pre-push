@@ -1,0 +1,32 @@
+#!/bin/bash
+# pre-push hook: runs the full test suite before allowing a push.
+# Install by running: git config core.hooksPath .githooks
+# Or run: eng/setup-hooks.ps1
+
+set -e
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+SOLUTION="$REPO_ROOT/src/src.sln"
+
+echo ""
+echo "========================================"
+echo "  Pre-push hook: running test suite"
+echo "========================================"
+echo ""
+
+if ! dotnet test "$SOLUTION" --verbosity minimal; then
+    echo ""
+    echo "========================================"
+    echo "  PUSH BLOCKED: tests failed."
+    echo "  Fix the failing tests and try again."
+    echo "========================================"
+    echo ""
+    exit 1
+fi
+
+echo ""
+echo "========================================"
+echo "  All tests passed. Push proceeding."
+echo "========================================"
+echo ""
+exit 0

@@ -1,0 +1,72 @@
+Citizens License
+
+Overview: Citizens License applicable to proprietary code developed by Citizens Financial Group, Inc. (“CFG”) that is non-sub-licensable and exclusive to CFG.
+
+
+Version 1.0
+
+
+PLEASE READ THIS DOCUMENT CAREFULLY AND IN ITS ENTIRETY. THE ACCOMPANYING CODE IS GOVERNED UNDER THE TERMS OF THIS LICENSE (“LICENSE”). ANY USE, MODIFICATION OR DISTRIBUTION OF THE CODE CONSTITUTES THE LICENSEE’S ACCEPTANCE OF THIS LICENSE.
+
+
+1. DEFINITIONS
+
+a. 1.1 “Contributor” means any person or entity that creates or contributes to the Code.
+
+b. 1.2 “Covered Code” means the Original Code, Modifications, the combination of Original Code and any Modifications, and/or any respective portions thereof.
+
+c. 1.3 “Modification” mean any addition to, deletion from, and/or change to, the substance and/or structure of the Original Code, any previous Modifications, the combination of Original Code and any previous Modifications, and/or any respective portions thereof.
+
+d. 1.4 “Original Code” means (a) the Source Code of a program or other work as originally made available by CFG under this License, including the Source Code of any updates or upgrades to such programs or works made available by CFG under this License; and (b) the object code compiled from such Source Code and originally made available under this License.
+
+e. 1.5 “Source Code” means the human readable form of a program or other work that is suitable for making modifications to it, including all modules it contains, plus any associated interface definition files, scripts used to control compilation and installation of an executable (object code).
+
+f. 1.6 “You” or “Your” means an individual or entity accessing the Covered Code.
+
+2. GRANT OF LICENSE
+
+a. The Covered Code is the exclusive property of CFG and is for exclusive use by CFG. Any use, modification, or distribution of the Covered Code is not allowed without the express written consent of CFG.
+
+3. RESTRICTIONS
+
+a. You shall not sublicense, distribute, or otherwise make the Covered Code available to any third party outside of CFG. All distribution of the Covered Code, including the Source Code, Original Code and any Modifications made by Contributor(s) under this License, must remain internal to CFG unless provided the express written consent of CFG.
+
+b. You may not transfer or assign any rights or obligations under this License to any other party, including internal or external third parties without the express written consent of CFG.
+
+4. OWNERSHIP
+
+a. CFG retains all rights, title, and interest in and to the Covered Code, including any Modifications made by Contributor(s) under this License. CFG also retains all rights, title, and interest in and to the Original Code and any Modifications made by or on behalf of CFG.
+
+5. NO WARRANTY
+
+a. The Covered Code is provided “as is”, without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement.
+
+b. You are responsible for determining the appropriateness of using the Covered Code and assume all risks associated with its exercise of rights under this License, including but not
+
+limited to the risks and costs of errors, compliance with applicable laws, damage to or loss of data, programs or equipment, and unavailability or interruption of operations.
+
+6. DISCLAIMER OF LIABILITY
+
+a. TO THE EXTENT NOT PROHIBITED BY LAW, IN NO EVENT SHALL CFG BE LIABLE FOR ANY INCIDENTAL, SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES ARISING OUT OF OR RELATING TO THIS LICENSE OR YOUR USE OR INABILITY TO USE THE COVERED CODE, OR ANY PORTION THEREOF, WHETHER UNDER A THEORY OF CONTRACT, WARRANTY, TORT (INCLUDING NEGLIGENCE), PRODUCTS LIABILITY OR OTHERWISE.
+
+7. TERMINATION
+
+a. This License and any rights granted hereunder will terminate automatically without notice from CFG if You fail to comply with any term(s) of this License and fail to cure such breach within a reasonable time after becoming aware of such breach.
+
+b. Upon termination, You agree to immediately stop any use, reproduction, modification and distribution of the Covered Code. You must further destroy all copies of the Covered Code that may have been acquired during use.
+
+8. MISCELLANEOUS
+
+a. 8.1 Agreement: This License constitutes the entire agreement between parties with respect to the Covered Code and supersedes all prior agreements and/or understandings.
+
+b. 8.2 Independent Development. Nothing in this License will impair CFG’s right to acquire, license, develop, have others develop for it, and/or use Covered Code in the development of services and products based on Modifications that You may develop.
+
+c. 8.3 Severability and Survival. If any part of this License is deemed or found to be unenforceable for any reason, that provision of the License will be enforced to the maximum extent permissible to effect the benefit and intent of CFG and the remainder shall remain enforceable.
+
+d. 8.4 Venue Selection. Any litigation or other dispute resolution between You and CFG concerning the validity, enforceability, coverage, or scope of this License shall be resolved in a Rhode Island state or federal court of law, and the parties hereby submit to the jurisdiction of such a court for such purpose.
+
+e. 8.5 Class Action and Class Arbitration Waiver: You shall not be entitled to join or consolidate disputes by or against others in any court action or arbitration related to this License, or to include in any court action or arbitration any dispute as a representative or member of a class, or to act in any arbitration in the interest of the general public or in a private attorney general capacity. This is so whether or not the claim has been assigned.
+
+f. 8.6 Versions of the License: CFG may publish revised and/or new versions of this License on its sole discretion. No one other than CFG has the right to modify the terms applicable to the Covered Code under this License.
+
+g. 8.7 Governing Law: This License shall be governed by and construed in accordance with the laws of the state of Rhode Island.

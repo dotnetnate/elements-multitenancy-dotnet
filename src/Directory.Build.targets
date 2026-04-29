@@ -1,0 +1,28 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- Convention: any project whose name contains ".Tests." is not packable -->
+    <IsPackable Condition="$(MSBuildProjectName.Contains('.Tests.'))">false</IsPackable>
+  </PropertyGroup>
+
+  <!--
+    Copy the project-level README.md from /docs/<category>/<ProjectName>.md
+    into the NuGet package as README.md.
+    Only runs during pack (not build/test). Falls back silently if the file does not exist.
+  -->
+  <Target Name="_IncludeDocsReadmeInPackage" BeforeTargets="_GetPackageFiles">
+    <PropertyGroup>
+      <_DocsCategory>$([System.String]::Copy('$(MSBuildProjectName)').Split('.')[1].ToLowerInvariant())</_DocsCategory>
+      <_ProjectReadmePath>$(MSBuildThisFileDirectory)..\docs\$(_DocsCategory)\$(MSBuildProjectName).md</_ProjectReadmePath>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="Exists('$(_ProjectReadmePath)')">
+      <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <ItemGroup Condition="Exists('$(_ProjectReadmePath)')">
+      <None Include="$(_ProjectReadmePath)" Pack="true" PackagePath="README.md" />
+    </ItemGroup>
+  </Target>
+
+</Project>

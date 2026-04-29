@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- File name extension must be .runsettings
+     Module path filtering excludes third-party assemblies at data collection time.
+     This ensures local coverage reports match CI behavior. -->
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="Code Coverage" uri="datacollector://Microsoft/CodeCoverage/2.0">
+        <Configuration>
+          <CodeCoverage>
+            <!-- Exclude third-party assemblies by module path pattern -->
+            <ModulePaths>
+              <Exclude>
+                <!-- Microsoft & System assemblies -->
+                <ModulePath>.*Microsoft\..*\.dll$</ModulePath>
+                <ModulePath>.*System\..*\.dll$</ModulePath>
+                <ModulePath>.*netstandard\.dll$</ModulePath>
+                <ModulePath>.*mscorlib\.dll$</ModulePath>
+                
+                <!-- Third-party NuGet packages -->
+                <ModulePath>.*\\FluentValidation\.dll$</ModulePath>
+                <ModulePath>.*\\AutoMapper\.dll$</ModulePath>
+                <ModulePath>.*\\Grpc\..*\.dll$</ModulePath>
+                <ModulePath>.*\\Google\..*\.dll$</ModulePath>
+                
+                <!-- Test assemblies -->
+                <ModulePath>.*Tests\.Unit\.dll$</ModulePath>
+                <ModulePath>.*Tests\.Integration\.dll$</ModulePath>
+              </Exclude>
+            </ModulePaths>
+            
+            <Attributes>
+              <Exclude>
+                <Attribute>^System\.Diagnostics\.DebuggerHiddenAttribute$</Attribute>
+                <Attribute>^System\.Diagnostics\.DebuggerNonUserCodeAttribute$</Attribute>
+                <Attribute>^System\.CodeDom\.Compiler\.GeneratedCodeAttribute$</Attribute>
+                <Attribute>^System\.Diagnostics\.CodeAnalysis\.ExcludeFromCodeCoverageAttribute$</Attribute>
+              </Exclude>
+            </Attributes>
+          </CodeCoverage>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

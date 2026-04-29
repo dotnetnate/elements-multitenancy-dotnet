@@ -1,0 +1,12 @@
+{
+    "[csharp]": {
+        "editor.defaultFormatter": "ms-dotnettools.csharp"
+    },
+    "dotnet.solution.autoOpen": "src/MultiTenancy.sln",
+    "csharp.format.enable": true,
+    "dotnet.enableWorkspaceBasedDevelopment": false,
+    "dotnet.server.useOmnisharp": true,
+    "omnisharp.enableEditorConfigSupport": true,
+    "omnisharp.useEditorFormattingSettings": true,
+    "sonarlint.analysisExcludesStandalone": "**/*Tests.*/**"
+}
