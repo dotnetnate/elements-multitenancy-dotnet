@@ -1,0 +1,25 @@
+<Project Sdk="MSTest.Sdk/4.2.2">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Elements.MultiTenancy.Extensions.AspNet\Elements.MultiTenancy.Extensions.AspNet.csproj" />
+    <ProjectReference Include="..\..\..\..\elements-core-dotnet\src\Core\Elements.Core\Elements.Core.csproj" Condition="'$(ElementsCoreReferenceMode)' == 'Project'" />
+    <PackageReference Include="Elements.Core" Version="$(ElementsCorePackageVersion)" Condition="'$(ElementsCoreReferenceMode)' == 'Package'" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="MSTest.Analyzers" Version="4.2.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="MSTest.TestAdapter" Version="4.2.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="MSTest.TestFramework" Version="4.2.1" />
+  </ItemGroup>
+</Project>

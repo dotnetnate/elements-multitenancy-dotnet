@@ -18,10 +18,10 @@
                 <ModulePath>.*mscorlib\.dll$</ModulePath>
                 
                 <!-- Third-party NuGet packages -->
-                <ModulePath>.*\\FluentValidation\.dll$</ModulePath>
-                <ModulePath>.*\\AutoMapper\.dll$</ModulePath>
-                <ModulePath>.*\\Grpc\..*\.dll$</ModulePath>
-                <ModulePath>.*\\Google\..*\.dll$</ModulePath>
+                <ModulePath>.*[\\/]FluentValidation\.dll$</ModulePath>
+                <ModulePath>.*[\\/]AutoMapper\.dll$</ModulePath>
+                <ModulePath>.*[\\/]Grpc\..*\.dll$</ModulePath>
+                <ModulePath>.*[\\/]Google\..*\.dll$</ModulePath>
                 
                 <!-- Test assemblies -->
                 <ModulePath>.*Tests\.Unit\.dll$</ModulePath>

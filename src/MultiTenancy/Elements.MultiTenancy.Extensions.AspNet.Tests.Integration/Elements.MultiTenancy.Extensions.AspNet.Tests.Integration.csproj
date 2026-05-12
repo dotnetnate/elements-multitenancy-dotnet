@@ -1,35 +1,27 @@
-<Project Sdk="MSTest.Sdk/4.2.1">
-
+<Project Sdk="MSTest.Sdk/4.2.2">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <UseVSTest>true</UseVSTest>
+    <RootNamespace>MyOrg.Elements.MultiTenancy</RootNamespace>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.7" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.7" />
+    <ProjectReference Include="..\Elements.MultiTenancy.Extensions.AspNet\Elements.MultiTenancy.Extensions.AspNet.csproj" />
   </ItemGroup>
-
   <ItemGroup>
-    <ProjectReference Include="..\Elements.MultiTenancy.Abstractions\Elements.MultiTenancy.Abstractions.csproj" />
+    <PackageReference Include="Testcontainers" Version="4.4.0" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Update="MSTest.Analyzers" Version="4.2.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Update="MSTest.TestAdapter" Version="4.2.1" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Update="MSTest.TestFramework" Version="4.2.1" />
   </ItemGroup>
-
 </Project>

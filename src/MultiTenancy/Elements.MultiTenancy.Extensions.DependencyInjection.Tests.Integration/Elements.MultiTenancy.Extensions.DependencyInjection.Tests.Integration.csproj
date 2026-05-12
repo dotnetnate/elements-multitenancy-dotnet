@@ -1,15 +1,16 @@
-<Project Sdk="MSTest.Sdk/4.2.1">
+<Project Sdk="MSTest.Sdk/4.2.2">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <UseVSTest>true</UseVSTest>
+    <RootNamespace>MyOrg.Elements.MultiTenancy</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Elements.MultiTenancy.Extensions.AspNet\Elements.MultiTenancy.Extensions.AspNet.csproj" />
-    <ProjectReference Include="$(ElementsCoreRoot)\Elements.Core\Elements.Core.csproj" Condition="'$(ElementsCoreReferenceMode)' == 'Project'" />
-    <PackageReference Include="Elements.Core" Version="$(ElementsCorePackageVersion)" Condition="'$(ElementsCoreReferenceMode)' == 'Package'" />
+    <ProjectReference Include="..\Elements.MultiTenancy.Extensions.DependencyInjection\Elements.MultiTenancy.Extensions.DependencyInjection.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Testcontainers" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="MSTest.Analyzers" Version="4.2.1">

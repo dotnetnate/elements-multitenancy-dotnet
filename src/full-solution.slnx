@@ -1,0 +1,21 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/MultiTenancy/">
+    <Project Path="MultiTenancy/Elements.MultiTenancy.Extensions.AspNet.Tests.Integration/Elements.MultiTenancy.Extensions.AspNet.Tests.Integration.csproj" />
+    <Project Path="MultiTenancy/Elements.MultiTenancy.Extensions.DependencyInjection.Tests.Integration/Elements.MultiTenancy.Extensions.DependencyInjection.Tests.Integration.csproj" />
+    <Project Path="MultiTenancy/Elements.MultiTenancy.Tests.Integration/Elements.MultiTenancy.Tests.Integration.csproj" />
+  </Folder>
+  <Project Path="MultiTenancy/Elements.MultiTenancy.Extensions.AspNet.Tests.Benchmark/Elements.MultiTenancy.Extensions.AspNet.Tests.Benchmark.csproj" />
+  <Project Path="MultiTenancy/Elements.MultiTenancy.Extensions.AspNet.Tests.Unit/Elements.MultiTenancy.Extensions.AspNet.Tests.Unit.csproj" />
+  <Project Path="MultiTenancy/Elements.MultiTenancy.Extensions.AspNet/Elements.MultiTenancy.Extensions.AspNet.csproj" />
+  <Project Path="MultiTenancy/Elements.MultiTenancy.Extensions.DependencyInjection.Tests.Benchmark/Elements.MultiTenancy.Extensions.DependencyInjection.Tests.Benchmark.csproj" />
+  <Project Path="MultiTenancy/Elements.MultiTenancy.Extensions.DependencyInjection.Tests.Unit/Elements.MultiTenancy.Extensions.DependencyInjection.Tests.Unit.csproj" />
+  <Project Path="MultiTenancy/Elements.MultiTenancy.Extensions.DependencyInjection/Elements.MultiTenancy.Extensions.DependencyInjection.csproj" />
+  <Project Path="MultiTenancy/Elements.MultiTenancy.Tests.Benchmark/Elements.MultiTenancy.Tests.Benchmark.csproj" />
+  <Project Path="MultiTenancy/Elements.MultiTenancy.Tests.Unit/Elements.MultiTenancy.Tests.Unit.csproj" />
+  <Project Path="MultiTenancy/Elements.MultiTenancy/Elements.MultiTenancy.csproj" />
+</Solution>

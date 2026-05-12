@@ -1,0 +1,11 @@
+<Solution>
+  <Project Path="../../../elements-core-dotnet/src/Core/Elements.Core/Elements.Core.csproj" />
+  <Project Path="../../../elements-core-dotnet/src/Security/Elements.Security.Authorization/Elements.Security.Authorization.csproj" />
+  <Project Path="../../../elements-core-dotnet/src/Security/Elements.Security.Identity/Elements.Security.Identity.csproj" />
+  <Project Path="Elements.MultiTenancy.Extensions.AspNet.Tests.Integration/Elements.MultiTenancy.Extensions.AspNet.Tests.Integration.csproj" />
+  <Project Path="Elements.MultiTenancy.Extensions.AspNet/Elements.MultiTenancy.Extensions.AspNet.csproj" />
+  <Project Path="Elements.MultiTenancy.Extensions.DependencyInjection.Tests.Integration/Elements.MultiTenancy.Extensions.DependencyInjection.Tests.Integration.csproj" />
+  <Project Path="Elements.MultiTenancy.Extensions.DependencyInjection/Elements.MultiTenancy.Extensions.DependencyInjection.csproj" />
+  <Project Path="Elements.MultiTenancy.Tests.Integration/Elements.MultiTenancy.Tests.Integration.csproj" />
+  <Project Path="Elements.MultiTenancy/Elements.MultiTenancy.csproj" />
+</Solution>

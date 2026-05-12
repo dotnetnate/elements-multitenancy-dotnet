@@ -17,7 +17,7 @@ permissions:
     
 env:
   SOLUTION_ROOT: ./src
-  SOLUTION_FILE_NAME: src.sln
+  SOLUTION_FILE_NAME: MultiTenancy.sln
   
 jobs:
   build:

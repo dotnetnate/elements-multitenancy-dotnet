@@ -42,6 +42,14 @@
     <Copyright>Copyright © MyOrg $([System.DateTime]::Now.Year)</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
+    <RepositoryUrl Condition="'$(RepositoryUrl)' == ''">https://github.com/MyOrg/elements-multitenancy-dotnet</RepositoryUrl>
+    <PackageProjectUrl Condition="'$(PackageProjectUrl)' == ''">https://github.com/MyOrg/elements-multitenancy-dotnet</PackageProjectUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageTags Condition="'$(PackageTags)' == ''">elements;dotnet;multitenancy;saas</PackageTags>
+    <Description Condition="'$(Description)' == ''">$(MSBuildProjectName) — part of the Elements .NET toolkit (Multi-Tenancy).</Description>
     <Product>Elements.MultiTenancy</Product>
 
     <!-- All projects are packable by default; tests and exes are excluded in Directory.Build.targets -->
@@ -59,8 +67,11 @@
   <PropertyGroup Condition="!$(MSBuildProjectName.Contains('.Tests.'))">
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <DocumentationFile>$(MSBuildProjectDirectory)/bin/docs/docs.xml</DocumentationFile>
-    <!-- Do not fail/warn on missing XML comments. -->
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <NoWarn>$(NoWarn);CS1570;CS1572;CS1573;CS1574;CS1587;CS1591;NU1902</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(MSBuildProjectName.Contains('.Tests.'))">
+    <NoWarn>$(NoWarn);MSTEST0032;CS1570;CS1572;CS1573;CS1574;CS1587;CS1591;NU1902</NoWarn>
   </PropertyGroup>
 
 </Project>

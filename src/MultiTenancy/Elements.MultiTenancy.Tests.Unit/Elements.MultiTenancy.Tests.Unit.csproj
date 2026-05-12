@@ -1,25 +1,19 @@
-<Project Sdk="MSTest.Sdk/4.2.1">
+<Project Sdk="MSTest.Sdk/4.2.2">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <UseVSTest>true</UseVSTest>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FakeItEasy" Version="9.0.1" />
-    <PackageReference Include="coverlet.collector" Version="10.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.7" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.7" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.7" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../Elements.MultiTenancy.Extensions.DependencyInjection/Elements.MultiTenancy.Extensions.DependencyInjection.csproj" />
+    <ProjectReference Include="..\Elements.MultiTenancy\Elements.MultiTenancy.csproj" />
   </ItemGroup>
 
   <ItemGroup>
