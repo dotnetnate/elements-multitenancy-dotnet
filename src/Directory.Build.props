@@ -11,11 +11,10 @@
     <ElementsProductName>MultiTenancy</ElementsProductName>
     <ElementsCorePackageVersion Condition="'$(ElementsCorePackageVersion)' == ''">0.1.0</ElementsCorePackageVersion>
 
-    <!-- Unified versioning - all components can be overridden via command line or build agent -->
-    <!-- Examples: 
+    <!-- Unified versioning - all components can be overridden via command line or build agent. -->
+    <!-- Examples:
          dotnet pack /p:VersionMajor=2
          dotnet pack /p:Version=2.0.0
-         dotnet pack /p:PackageVersionMetadata=release-12345
     -->
 
     <!-- Assembly version components (defaults) -->
@@ -26,12 +25,7 @@
     <!-- Computed assembly version (can be overridden entirely) -->
     <Version Condition="'$(Version)' == ''">$(VersionMajor).$(VersionMinor).$(VersionPatch)</Version>
 
-    <!-- NuGet package version (can be overridden entirely) -->
-    <PackageVersionMetadataNormalized Condition="'$(PackageVersionMetadata)' != ''">
-      $([System.String]::Copy('$(PackageVersionMetadata)').Trim())</PackageVersionMetadataNormalized>
-    <PackageVersion
-      Condition="'$(PackageVersion)' == '' and '$(PackageVersionMetadataNormalized)' != ''">
-      $(Version)-$(PackageVersionMetadataNormalized)</PackageVersion>
+    <!-- NuGet package version (can be overridden entirely). -->
     <PackageVersion Condition="'$(PackageVersion)' == ''">$(Version)</PackageVersion>
 
     <!-- NuGet package metadata shared across all packable projects -->

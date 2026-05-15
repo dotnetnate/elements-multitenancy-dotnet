@@ -86,8 +86,7 @@ jobs:
       - name: Build
         run: |
           dotnet build $SOLUTION_ROOT/$SOLUTION_FILE_NAME --no-restore -c Release \
-            /p:VersionPatch=${{ github.run_number }} \
-            /p:PackageVersionMetadata=ci-${{ github.sha }}
+            /p:VersionPatch=${{ github.run_number }}
 
       - name: Count Lines of Code (cloc)
         uses: djdefi/cloc-action@6
@@ -244,8 +243,7 @@ jobs:
       - name: Pack
         run: |
           dotnet pack $SOLUTION_ROOT/$SOLUTION_FILE_NAME -c Release \
-            /p:VersionPatch=${{ github.run_number }} \
-            /p:PackageVersionMetadata=ci-${{ github.sha }}
+            /p:VersionPatch=${{ github.run_number }}
 
       - name: Collect NuGet packages
         run: |
