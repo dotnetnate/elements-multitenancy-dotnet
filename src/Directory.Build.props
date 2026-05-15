@@ -26,15 +26,13 @@
     <!-- Computed assembly version (can be overridden entirely) -->
     <Version Condition="'$(Version)' == ''">$(VersionMajor).$(VersionMinor).$(VersionPatch)</Version>
 
-    <!-- Package version metadata (defaults to dev-{timestamp}, can be overridden) -->
-    <UnixEpochTicks Condition="'$(UnixEpochTicks)' == ''">621355968000000000</UnixEpochTicks>
-    <UnixTimestamp Condition="'$(UnixTimestamp)' == ''">$([MSBuild]::Divide($([MSBuild]::Subtract($([System.DateTime]::UtcNow.Ticks),
-      $(UnixEpochTicks))), 10000000))</UnixTimestamp>
-    <PackageVersionMetadata Condition="'$(PackageVersionMetadata)' == ''">
-      multitenancy-dev-$(UnixTimestamp)</PackageVersionMetadata>
-
     <!-- NuGet package version (can be overridden entirely) -->
-    <PackageVersion Condition="'$(PackageVersion)' == ''">$(Version)-$(PackageVersionMetadata)</PackageVersion>
+    <PackageVersionMetadataNormalized Condition="'$(PackageVersionMetadata)' != ''">
+      $([System.String]::Copy('$(PackageVersionMetadata)').Trim())</PackageVersionMetadataNormalized>
+    <PackageVersion
+      Condition="'$(PackageVersion)' == '' and '$(PackageVersionMetadataNormalized)' != ''">
+      $(Version)-$(PackageVersionMetadataNormalized)</PackageVersion>
+    <PackageVersion Condition="'$(PackageVersion)' == ''">$(Version)</PackageVersion>
 
     <!-- NuGet package metadata shared across all packable projects -->
     <Authors>MyOrg</Authors>
