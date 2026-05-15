@@ -11,9 +11,10 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Elements.MultiTenancy\Elements.MultiTenancy.csproj" />
-    <ProjectReference Include="..\..\..\..\elements-core-dotnet\src\Core\Elements.Core\Elements.Core.csproj" Condition="'$(ElementsCoreReferenceMode)' == 'Project'" />
-    <ProjectReference Include="..\..\..\..\elements-core-dotnet\src\Security\Elements.Security.Authorization\Elements.Security.Authorization.csproj" Condition="'$(ElementsCoreReferenceMode)' == 'Project'" />
-    <PackageReference Include="Elements.Core" Version="$(ElementsCorePackageVersion)" Condition="'$(ElementsCoreReferenceMode)' == 'Package'" />
-    <PackageReference Include="Elements.Security.Authorization" Version="$(ElementsCorePackageVersion)" Condition="'$(ElementsCoreReferenceMode)' == 'Package'" />
+    <PackageReference Include="Elements.Core" Version="$(ElementsCorePackageVersion)"
+      ExcludeAssets="build" />
+    <PackageReference Include="Elements.Security.Authorization"
+      Version="$(ElementsCorePackageVersion)"
+      ExcludeAssets="build" />
   </ItemGroup>
 </Project>

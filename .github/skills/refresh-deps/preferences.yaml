@@ -1,0 +1,27 @@
+# refresh-deps skill preferences
+# This file is read by the refresh-deps skill at runtime.
+# Allowed values are documented alongside each key.
+
+# defaultMode — action to take when the user's request is ambiguous.
+#   audit  — list outdated packages and CVEs; do not modify anything (default).
+#   update — apply upgrades. Only recommended if you trust the workspace CI.
+defaultMode: audit
+
+# updateStrategy — default upgrade aggressiveness when mode is update.
+#   in-range — respect declared version ranges; minor/patch only (default, safe).
+#   major    — allow cross-major upgrades; may introduce breaking changes.
+updateStrategy: in-range
+
+# onProjectFailure — behavior when a per-project audit or update exits non-zero.
+#   continue — record the failure and proceed to the next project (default).
+#   stop     — abort the entire run at the first failure.
+onProjectFailure: continue
+
+# scanDepth — maximum directory depth to descend when discovering projects.
+#   0 means unlimited. Lower values speed up huge monorepos.
+scanDepth: 0
+
+# includeDevDependencies — whether dev/test-only dependencies are audited/updated.
+#   true  — include them (default).
+#   false — skip dev-only packages where the tool supports it.
+includeDevDependencies: true

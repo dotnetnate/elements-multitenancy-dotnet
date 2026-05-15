@@ -1,0 +1,11 @@
+name: msdn
+description: Microsoft Learn / MSDN-style API reference documentation.
+options:
+  showAppliesToTable: true
+  showThreadSafety: true
+  showInheritanceBlock: true
+  showDerivedBlock: true
+  codeFenceInfoString: true
+  colors:
+    accent: "#0078D4"
+    link: "#005A9E"

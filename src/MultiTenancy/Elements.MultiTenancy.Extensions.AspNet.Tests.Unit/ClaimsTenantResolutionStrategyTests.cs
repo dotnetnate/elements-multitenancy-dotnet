@@ -7,9 +7,11 @@ using System.Security.Claims;
 namespace Elements.MultiTenancy.Extensions.AspNet.Tests.Unit;
 
 [TestClass]
-public class ClaimsTenantResolutionStrategyTests {
+public class ClaimsTenantResolutionStrategyTests
+{
     [TestMethod]
-    public async Task ResolveAsync_WithValidTenantClaim_ReturnsTenantId() {
+    public async Task ResolveAsync_WithValidTenantClaim_ReturnsTenantId()
+    {
         // Arrange
         var options = new MultiTenancyOptions();
         var claimsConfig = new WellKnownClaimsConfiguration();
@@ -27,7 +29,8 @@ public class ClaimsTenantResolutionStrategyTests {
     }
 
     [TestMethod]
-    public async Task ResolveAsync_WithCustomClaimType_UsesCustomType() {
+    public async Task ResolveAsync_WithCustomClaimType_UsesCustomType()
+    {
         // Arrange
         var options = new MultiTenancyOptions { ClaimType = "org_id" };
         var claimsConfig = new WellKnownClaimsConfiguration();
@@ -45,7 +48,8 @@ public class ClaimsTenantResolutionStrategyTests {
     }
 
     [TestMethod]
-    public async Task ResolveAsync_WithUnauthenticatedUser_ReturnsNull() {
+    public async Task ResolveAsync_WithUnauthenticatedUser_ReturnsNull()
+    {
         // Arrange
         var options = new MultiTenancyOptions();
         var claimsConfig = new WellKnownClaimsConfiguration();
@@ -60,7 +64,8 @@ public class ClaimsTenantResolutionStrategyTests {
     }
 
     [TestMethod]
-    public async Task ResolveAsync_WithNoTenantClaim_ReturnsNull() {
+    public async Task ResolveAsync_WithNoTenantClaim_ReturnsNull()
+    {
         // Arrange
         var options = new MultiTenancyOptions();
         var claimsConfig = new WellKnownClaimsConfiguration();
@@ -78,7 +83,8 @@ public class ClaimsTenantResolutionStrategyTests {
     }
 
     [TestMethod]
-    public void Priority_Returns10() {
+    public void Priority_Returns10()
+    {
         // Arrange
         var options = new MultiTenancyOptions();
         var claimsConfig = new WellKnownClaimsConfiguration();
@@ -86,5 +92,25 @@ public class ClaimsTenantResolutionStrategyTests {
 
         // Assert
         Assert.AreEqual(10, strategy.Priority);
+    }
+
+    [TestMethod]
+    public void Constructor_When_Options_Is_Null_Then_Throws()
+    {
+        // Arrange
+        var claimsConfig = new WellKnownClaimsConfiguration();
+
+        // Act & Assert
+        Assert.ThrowsExactly<ArgumentNullException>(() => new ClaimsTenantResolutionStrategy(null!, claimsConfig));
+    }
+
+    [TestMethod]
+    public void Constructor_When_Claims_Configuration_Is_Null_Then_Throws()
+    {
+        // Arrange
+        var options = new MultiTenancyOptions();
+
+        // Act & Assert
+        Assert.ThrowsExactly<ArgumentNullException>(() => new ClaimsTenantResolutionStrategy(options, null!));
     }
 }

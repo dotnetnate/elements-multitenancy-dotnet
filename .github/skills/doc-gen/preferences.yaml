@@ -1,0 +1,34 @@
+# doc-gen — default preferences
+# User flags on the command line override these.
+
+defaultStyle: msdn
+defaultFormat: md
+
+# Output root relative to the target repo. `{style}` and `{format}` are
+# substituted at runtime.
+defaultOutputDir: "docs"
+
+# When true, subagents may invoke the platform's native doc extractor
+# (e.g. `dotnet build -p:GenerateDocumentationFile=true`) if the
+# intermediate files are missing. When false, they surface an error and stop.
+autoExtract: true
+
+# When true, the orchestrator scans each project's directory for the
+# per-project XML doc file at `<xmlPattern>` (default: `docs/docs.xml`)
+# rather than re-extracting every run. Set false to always re-extract.
+autoDiscoverXml: true
+
+# Relative path (per project) where compiler-emitted XML is expected.
+# For .NET this is set by the repo's `Directory.Build.props`.
+xmlPattern: "bin/docs/docs.xml"
+
+# Differential state file name (stored under the workspace output dir).
+stateFileName: ".doc-gen-state.json"
+
+# Behaviour when one project fails: `stop` or `continue`.
+onProjectFailure: continue
+
+# Description injected at the top of the workspace README (docs/README.md).
+# Can be overridden per-workspace by adding a `doc-gen.yaml` at the
+# workspace root with a `workspaceDescription:` key.
+workspaceDescription: ""

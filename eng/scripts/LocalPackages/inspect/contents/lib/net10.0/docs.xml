@@ -1,0 +1,2353 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Elements.Core</name>
+    </assembly>
+    <members>
+        <member name="T:MyOrg.Elements.Configuration.IServiceRegistry`1">
+             <summary>
+             Provides named service instance resolution for polymorphic service registrations.
+             </summary>
+             <typeparam name="TService">The service abstraction type.</typeparam>
+             <example>
+             <code language="csharp">
+             // Resolved from DI after AddPolymorphicService&lt;IMessageBus&gt;(...) registration:
+             IServiceRegistry&lt;IMessageBus&gt; registry =
+                 serviceProvider.GetRequiredService&lt;IServiceRegistry&lt;IMessageBus&gt;&gt;();
+            
+             IMessageBus defaultBus = registry.Default;
+             IMessageBus internalBus = registry.Get("Internal");
+            
+             if (registry.TryGet("Optional") is { } optionalBus)
+             {
+                 optionalBus.Publish(message);
+             }
+            
+             foreach (string name in registry.Names)
+             {
+                 Console.WriteLine(name);
+             }
+             </code>
+             </example>
+        </member>
+        <member name="P:MyOrg.Elements.Configuration.IServiceRegistry`1.Default">
+            <summary>
+            Gets the default service instance.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">Thrown when no default service instance is registered.</exception>
+        </member>
+        <member name="P:MyOrg.Elements.Configuration.IServiceRegistry`1.Names">
+            <summary>
+            Gets the names of all registered service instances.
+            </summary>
+        </member>
+        <member name="M:MyOrg.Elements.Configuration.IServiceRegistry`1.Get(System.String)">
+            <summary>
+            Gets a named service instance.
+            </summary>
+            <param name="name">The instance name.</param>
+            <returns>The service instance.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when <paramref name="name"/> is <c>null</c>, empty, or whitespace.</exception>
+            <exception cref="T:System.InvalidOperationException">Thrown when no service instance with the specified <paramref name="name"/> is registered.</exception>
+            <example>
+            <code language="csharp">
+            IMessageBus internalBus = registry.Get("Internal");
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Configuration.IServiceRegistry`1.TryGet(System.String)">
+            <summary>
+            Attempts to get a named service instance, returning <c>null</c> when no instance with the
+            specified <paramref name="name"/> is registered.
+            </summary>
+            <param name="name">The instance name.</param>
+            <returns>The service instance if registered; otherwise, <c>null</c>.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when <paramref name="name"/> is <c>null</c>, empty, or whitespace.</exception>
+            <remarks>
+            Returns a nullable reference rather than using an <c>out</c> parameter to remain compatible
+            with the covariant <typeparamref name="TService"/> type parameter on this interface.
+            </remarks>
+            <example>
+            <code language="csharp">
+            if (registry.TryGet("Internal") is { } internalBus)
+            {
+                internalBus.Publish(message);
+            }
+            </code>
+            </example>
+        </member>
+        <member name="T:MyOrg.Elements.Configuration.PolymorphicServiceBuilder`1">
+            <summary>
+            Builder for registering provider implementations in a polymorphic service configuration.
+            </summary>
+            <typeparam name="TService">The service abstraction type.</typeparam>
+            <example>
+            <code language="csharp">
+            services.AddPolymorphicService&lt;IMessageBus&gt;(configuration, "Messaging", builder =&gt;
+            {
+                builder.AddProvider&lt;KafkaMessageBus, KafkaOptions&gt;("Kafka");
+                builder.AddProvider&lt;EmailMessageBus, EmailOptions&gt;("Email");
+                builder.AddProvider&lt;NoopMessageBus&gt;("Noop");
+            });
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Configuration.PolymorphicServiceBuilder`1.AddProvider``2(System.String,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Registers a provider with strongly-typed options that are auto-bound from the Settings configuration section.
+            The implementation is constructed via <c>ActivatorUtilities.CreateInstance</c>, so additional
+            constructor dependencies are resolved from DI automatically.
+            </summary>
+            <typeparam name="TImplementation">The concrete implementation type.</typeparam>
+            <typeparam name="TOptions">The options type, bound from the Settings section.</typeparam>
+            <param name="providerName">The provider name as it appears in the <c>"Provider"</c> configuration value.</param>
+            <param name="lifetime">The DI lifetime for instances of this provider. Defaults to <see cref="F:Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton"/>.</param>
+            <returns>The builder for chaining.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when <paramref name="providerName"/> is <see langword="null"/>, empty, or whitespace.</exception>
+            <example>
+            <code language="csharp">
+            builder.AddProvider&lt;KafkaMessageBus, KafkaOptions&gt;("Kafka");
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Configuration.PolymorphicServiceBuilder`1.AddProvider``1(System.String,Microsoft.Extensions.DependencyInjection.ServiceLifetime)">
+            <summary>
+            Registers a provider with no options. The implementation is constructed via
+            <c>ActivatorUtilities.CreateInstance</c>, so constructor dependencies are resolved from DI.
+            </summary>
+            <typeparam name="TImplementation">The concrete implementation type.</typeparam>
+            <param name="providerName">The provider name as it appears in the <c>"Provider"</c> configuration value.</param>
+            <param name="lifetime">The DI lifetime for instances of this provider. Defaults to <see cref="F:Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton"/>.</param>
+            <returns>The builder for chaining.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when <paramref name="providerName"/> is <see langword="null"/>, empty, or whitespace.</exception>
+            <example>
+            <code language="csharp">
+            builder.AddProvider&lt;NoopMessageBus&gt;("Noop");
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Configuration.PolymorphicServiceBuilder`1.GetRegistration(System.String)">
+            <summary>
+            Gets the registration for the specified provider name.
+            </summary>
+        </member>
+        <member name="M:MyOrg.Elements.Configuration.PolymorphicServiceBuilder`1.GetAllProviderNames">
+            <summary>
+            Gets all registered provider names.
+            </summary>
+        </member>
+        <member name="M:MyOrg.Elements.Configuration.PolymorphicServiceBuilder`1.RegisterKeyedService(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.String,System.String,Microsoft.Extensions.Configuration.IConfigurationSection)">
+            <summary>
+            Registers a provider implementation as a keyed service in the service collection.
+            Options are configured using the service key as the named options key.
+            </summary>
+            <param name="services">The service collection.</param>
+            <param name="providerName">The provider name (as registered via <see cref="M:MyOrg.Elements.Configuration.PolymorphicServiceBuilder`1.AddProvider``1(System.String,Microsoft.Extensions.DependencyInjection.ServiceLifetime)"/>).</param>
+            <param name="serviceKey">The DI service key for this instance.</param>
+            <param name="settingsSection">Optional configuration section containing provider settings.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="services"/> is <see langword="null"/>.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when <paramref name="providerName"/> or <paramref name="serviceKey"/> is <see langword="null"/>, empty, or whitespace.</exception>
+            <exception cref="T:System.InvalidOperationException">Thrown when no provider with <paramref name="providerName"/> has been registered on this builder.</exception>
+            <example>
+            <code language="csharp">
+            builder.RegisterKeyedService(
+                services,
+                providerName: "Kafka",
+                serviceKey: "Internal",
+                settingsSection: configuration.GetSection("Messaging:Internal:Settings"));
+            </code>
+            </example>
+        </member>
+        <member name="T:MyOrg.Elements.Configuration.PolymorphicServiceCollectionExtensions">
+            <summary>
+            Extension methods for registering polymorphic services from configuration.
+            </summary>
+            <example>
+            <code language="csharp">
+            services.AddPolymorphicService&lt;IMessageBus&gt;(
+                configuration,
+                sectionPath: "Messaging",
+                configure: builder =&gt;
+                {
+                    builder.AddProvider&lt;KafkaMessageBus, KafkaOptions&gt;("Kafka");
+                    builder.AddProvider&lt;EmailMessageBus, EmailOptions&gt;("Email");
+                });
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Configuration.PolymorphicServiceCollectionExtensions.AddPolymorphicService``1(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration,System.String,System.Action{MyOrg.Elements.Configuration.PolymorphicServiceBuilder{``0}})">
+            <summary>
+            Registers a polymorphic service whose implementation is determined by configuration.
+            Supports both single-provider and multi-provider (named instances) configuration shapes.
+            <para>
+            <b>Single-provider</b> (no <c>Providers</c> sub-section):
+            <code>
+            { "Provider": "Kafka", "Settings": { ... } }
+            </code>
+            <b>Multi-provider</b> (with <c>Providers</c> sub-section):
+            <code>
+            {
+              "Default": "Internal",
+              "Providers": {
+                "Public": { "Provider": "Email", "Settings": { ... } },
+                "Internal": { "Provider": "Kafka", "Settings": { ... } }
+              }
+            }
+            </code>
+            </para>
+            </summary>
+            <typeparam name="TService">The service abstraction type.</typeparam>
+            <param name="services">The service collection.</param>
+            <param name="configuration">The configuration root.</param>
+            <param name="sectionPath">The configuration section path (e.g., "Messaging").</param>
+            <param name="configure">Action to register provider implementations.</param>
+            <returns>The service collection for chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="configuration"/> or <paramref name="configure"/> is <see langword="null"/>.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when <paramref name="sectionPath"/> is <see langword="null"/>, empty, or whitespace.</exception>
+            <exception cref="T:System.InvalidOperationException">Thrown when the configured <c>Provider</c> name has not been registered, when the configured section is missing, or when a multi-provider configuration cannot resolve a default provider.</exception>
+            <example>
+            <code language="csharp">
+            services.AddPolymorphicService&lt;IMessageBus&gt;(configuration, "Messaging", builder =&gt;
+            {
+                builder.AddProvider&lt;KafkaMessageBus, KafkaOptions&gt;("Kafka");
+            });
+            </code>
+            </example>
+        </member>
+        <member name="T:MyOrg.Elements.Configuration.PolymorphicServiceRegistration">
+            <summary>
+            Captures the registration metadata for a single provider in a polymorphic service configuration.
+            </summary>
+        </member>
+        <member name="P:MyOrg.Elements.Configuration.PolymorphicServiceRegistration.ConfigureOptions">
+            <summary>
+            Action that calls <c>services.Configure&lt;TOptions&gt;(name, section)</c>.
+            Null when the provider has no options type.
+            </summary>
+        </member>
+        <member name="P:MyOrg.Elements.Configuration.PolymorphicServiceRegistration.Factory">
+            <summary>
+            Factory that creates the service instance. Parameters: (serviceProvider, instanceName) → service.
+            </summary>
+        </member>
+        <member name="P:MyOrg.Elements.Configuration.PolymorphicServiceRegistration.Lifetime">
+            <summary>
+            The DI lifetime for this provider's service instances.
+            </summary>
+        </member>
+        <member name="T:MyOrg.Elements.Configuration.ServiceRegistry`1">
+            <summary>
+            Default implementation of <see cref="T:MyOrg.Elements.Configuration.IServiceRegistry`1"/> backed by keyed DI services.
+            </summary>
+        </member>
+        <member name="P:MyOrg.Elements.Configuration.ServiceRegistry`1.Default">
+            <inheritdoc/>
+        </member>
+        <member name="P:MyOrg.Elements.Configuration.ServiceRegistry`1.Names">
+            <inheritdoc/>
+        </member>
+        <member name="M:MyOrg.Elements.Configuration.ServiceRegistry`1.Get(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="M:MyOrg.Elements.Configuration.ServiceRegistry`1.TryGet(System.String)">
+            <inheritdoc/>
+        </member>
+        <member name="T:MyOrg.Elements.Guards.CollectionGuardClauseExtensions">
+            <summary>
+            Guard-clause extensions for <see cref="T:System.Collections.IEnumerable"/>-shaped arguments.
+            </summary>
+            <remarks>
+            The methods are generic on the concrete collection type (any reference type
+            implementing <see cref="T:System.Collections.IEnumerable"/>) rather than on a fixed
+            <c>IEnumerable&lt;T&gt;</c> carrier. This lets callers pass a value typed as
+            <c>List&lt;int&gt;</c>, <c>int[]</c>, <c>Dictionary&lt;K,V&gt;</c>, etc. directly —
+            including <c>var</c>-typed locals and callers compiled with
+            <c>&lt;Nullable&gt;disable&lt;/Nullable&gt;</c> — without forcing them to widen to
+            <c>IEnumerable&lt;T&gt;?</c>. Generics are invariant on the carrier struct, so a
+            fixed <c>GuardClause&lt;IEnumerable&lt;T&gt;?&gt;</c> parameter would not accept a
+            <c>GuardClause&lt;List&lt;T&gt;&gt;</c>; the open generic shape avoids that.
+            </remarks>
+            <example>
+            <code language="csharp">
+            IReadOnlyList&lt;int&gt; items = Guard.Against(items).NullOrEmpty().MaxCount(100).Value;
+            string[] tags = Guard.Against(tags).MinCount(1).ExactCount(3).Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.CollectionGuardClauseExtensions.NullOrEmpty``1(MyOrg.Elements.Guards.GuardClause{``0})">
+            <summary>Throws when the collection is <c>null</c> or contains no elements.</summary>
+            <typeparam name="T">The concrete collection type, which must implement <see cref="T:System.Collections.IEnumerable"/>.</typeparam>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the collection to check.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is <c>null</c>.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> contains no elements.</exception>
+            <example>
+            <code language="csharp">
+            IReadOnlyList&lt;int&gt; items = Guard.Against(items).NullOrEmpty().Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.CollectionGuardClauseExtensions.MinCount``1(MyOrg.Elements.Guards.GuardClause{``0},System.Int32)">
+            <summary>Throws when the collection is <c>null</c> or contains fewer than <paramref name="min"/> elements.</summary>
+            <typeparam name="T">The concrete collection type, which must implement <see cref="T:System.Collections.IEnumerable"/>.</typeparam>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the collection to check.</param>
+            <param name="min">The minimum number of elements required (inclusive). Must be non-negative.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is <c>null</c>.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when <paramref name="min"/> is negative.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when the collection has fewer than <paramref name="min"/> elements.</exception>
+            <remarks>Counting prefers <see cref="P:System.Collections.ICollection.Count"/> when available (O(1)); otherwise iterates lazily up to <paramref name="min"/>.</remarks>
+            <example>
+            <code language="csharp">
+            IReadOnlyList&lt;int&gt; items = Guard.Against(items).MinCount(2).Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.CollectionGuardClauseExtensions.MaxCount``1(MyOrg.Elements.Guards.GuardClause{``0},System.Int32)">
+            <summary>Throws when the collection is <c>null</c> or contains more than <paramref name="max"/> elements.</summary>
+            <typeparam name="T">The concrete collection type, which must implement <see cref="T:System.Collections.IEnumerable"/>.</typeparam>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the collection to check.</param>
+            <param name="max">The maximum number of elements allowed (inclusive). Must be non-negative.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is <c>null</c>.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when <paramref name="max"/> is negative.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when the collection has more than <paramref name="max"/> elements.</exception>
+            <remarks>Counting prefers <see cref="P:System.Collections.ICollection.Count"/> when available (O(1)); otherwise iterates lazily up to <paramref name="max"/> + 1.</remarks>
+            <example>
+            <code language="csharp">
+            IReadOnlyList&lt;int&gt; items = Guard.Against(items).MaxCount(100).Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.CollectionGuardClauseExtensions.ExactCount``1(MyOrg.Elements.Guards.GuardClause{``0},System.Int32)">
+            <summary>Throws when the collection is <c>null</c> or does not contain exactly <paramref name="count"/> elements.</summary>
+            <typeparam name="T">The concrete collection type, which must implement <see cref="T:System.Collections.IEnumerable"/>.</typeparam>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the collection to check.</param>
+            <param name="count">The required element count. Must be non-negative.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is <c>null</c>.</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when <paramref name="count"/> is negative.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when the collection has a different number of elements than <paramref name="count"/>.</exception>
+            <remarks>Counting prefers <see cref="P:System.Collections.ICollection.Count"/> when available (O(1)); otherwise iterates lazily up to <paramref name="count"/> + 1.</remarks>
+            <example>
+            <code language="csharp">
+            IReadOnlyList&lt;string&gt; coords = Guard.Against(coords).ExactCount(3).Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.CollectionGuardClauseExtensions.CountAtLeast(System.Collections.IEnumerable,System.Int32)">
+            <summary>
+            Counts elements in <paramref name="source"/>, short-circuiting when the count reaches
+            <paramref name="ceiling"/>. Returns the actual count when below the ceiling, or
+            <paramref name="ceiling"/> when at or above it. Uses O(1) <see cref="P:System.Collections.ICollection.Count"/>
+            when available.
+            </summary>
+        </member>
+        <member name="T:MyOrg.Elements.Guards.ComparableGuardClauseExtensions">
+            <summary>
+            Guard-clause extensions for arguments implementing <see cref="T:System.IComparable`1"/>.
+            </summary>
+            <example>
+            <code language="csharp">
+            int age = Guard.Against(age).LessThan(0).GreaterThan(150).Value;
+            decimal price = Guard.Against(price).OutOfRange(0m, 9_999.99m).Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.ComparableGuardClauseExtensions.LessThan``1(MyOrg.Elements.Guards.GuardClause{``0},``0)">
+            <summary>Throws <see cref="T:System.ArgumentOutOfRangeException"/> when the value is less than <paramref name="other"/>.</summary>
+            <typeparam name="T">The comparable type, which must implement <see cref="T:System.IComparable`1"/>.</typeparam>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the value to check.</param>
+            <param name="other">The exclusive lower bound to compare against.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is less than <paramref name="other"/>.</exception>
+            <example>
+            <code language="csharp">
+            int age = Guard.Against(age).LessThan(0).Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.ComparableGuardClauseExtensions.LessThanOrEqualTo``1(MyOrg.Elements.Guards.GuardClause{``0},``0)">
+            <summary>Throws <see cref="T:System.ArgumentOutOfRangeException"/> when the value is less than or equal to <paramref name="other"/>.</summary>
+            <typeparam name="T">The comparable type, which must implement <see cref="T:System.IComparable`1"/>.</typeparam>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the value to check.</param>
+            <param name="other">The value that the guarded value must be strictly greater than.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is less than or equal to <paramref name="other"/>.</exception>
+            <example>
+            <code language="csharp">
+            int priority = Guard.Against(priority).LessThanOrEqualTo(0).Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.ComparableGuardClauseExtensions.GreaterThan``1(MyOrg.Elements.Guards.GuardClause{``0},``0)">
+            <summary>Throws <see cref="T:System.ArgumentOutOfRangeException"/> when the value is greater than <paramref name="other"/>.</summary>
+            <typeparam name="T">The comparable type, which must implement <see cref="T:System.IComparable`1"/>.</typeparam>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the value to check.</param>
+            <param name="other">The exclusive upper bound to compare against.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is greater than <paramref name="other"/>.</exception>
+            <example>
+            <code language="csharp">
+            int age = Guard.Against(age).GreaterThan(150).Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.ComparableGuardClauseExtensions.GreaterThanOrEqualTo``1(MyOrg.Elements.Guards.GuardClause{``0},``0)">
+            <summary>Throws <see cref="T:System.ArgumentOutOfRangeException"/> when the value is greater than or equal to <paramref name="other"/>.</summary>
+            <typeparam name="T">The comparable type, which must implement <see cref="T:System.IComparable`1"/>.</typeparam>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the value to check.</param>
+            <param name="other">The value that the guarded value must be strictly less than.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is greater than or equal to <paramref name="other"/>.</exception>
+            <example>
+            <code language="csharp">
+            int index = Guard.Against(index).GreaterThanOrEqualTo(list.Count).Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.ComparableGuardClauseExtensions.OutOfRange``1(MyOrg.Elements.Guards.GuardClause{``0},``0,``0)">
+            <summary>Throws <see cref="T:System.ArgumentOutOfRangeException"/> when the value falls outside the inclusive range [<paramref name="min"/>, <paramref name="max"/>].</summary>
+            <typeparam name="T">The comparable type, which must implement <see cref="T:System.IComparable`1"/>.</typeparam>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the value to check.</param>
+            <param name="min">The inclusive lower bound of the acceptable range.</param>
+            <param name="max">The inclusive upper bound of the acceptable range.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is less than <paramref name="min"/> or greater than <paramref name="max"/>.</exception>
+            <example>
+            <code language="csharp">
+            int percentage = Guard.Against(percentage).OutOfRange(0, 100).Value;
+            </code>
+            </example>
+        </member>
+        <member name="T:MyOrg.Elements.Guards.DateTimeGuardClauseExtensions">
+            <summary>
+            Guard-clause extensions for <see cref="T:System.DateTime"/> and <see cref="T:System.DateTimeOffset"/> arguments.
+            </summary>
+            <example>
+            <code language="csharp">
+            DateTime scheduledAt = Guard.Against(scheduledAt).InThePast().Value;
+            DateTime dateOfBirth = Guard.Against(dateOfBirth).InTheFuture().Value;
+            DateTimeOffset expiresAt = Guard.Against(expiresAt).InThePast().Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.DateTimeGuardClauseExtensions.InThePast(MyOrg.Elements.Guards.GuardClause{System.DateTime})">
+            <summary>Throws <see cref="T:System.ArgumentOutOfRangeException"/> when the value is in the past relative to "now".
+            </summary>
+            <remarks>
+            Uses <see cref="P:System.DateTime.UtcNow"/> when <see cref="P:System.DateTime.Kind"/> is <see cref="F:System.DateTimeKind.Utc"/>
+            or <see cref="F:System.DateTimeKind.Unspecified"/>; only <see cref="F:System.DateTimeKind.Local"/> compares against
+            <see cref="P:System.DateTime.Now"/>. Treating <c>Unspecified</c> as UTC avoids latent time-zone bugs
+            when values originate from databases or serialization formats that drop the kind.
+            </remarks>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the <see cref="T:System.DateTime"/> to check.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is earlier than the current date and time.</exception>
+            <example>
+            <code language="csharp">
+            DateTime scheduledAt = Guard.Against(scheduledAt).InThePast().Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.DateTimeGuardClauseExtensions.InThePast(MyOrg.Elements.Guards.GuardClause{System.DateTimeOffset})">
+            <summary>Throws <see cref="T:System.ArgumentOutOfRangeException"/> when the offset-aware value is in the past relative to <see cref="P:System.DateTimeOffset.UtcNow"/>.</summary>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the <see cref="T:System.DateTimeOffset"/> to check.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is earlier than <see cref="P:System.DateTimeOffset.UtcNow"/>.</exception>
+            <example>
+            <code language="csharp">
+            DateTimeOffset expiresAt = Guard.Against(expiresAt).InThePast().Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.DateTimeGuardClauseExtensions.InTheFuture(MyOrg.Elements.Guards.GuardClause{System.DateTime})">
+            <summary>Throws <see cref="T:System.ArgumentOutOfRangeException"/> when the value is in the future relative to "now".
+            </summary>
+            <remarks>
+            Uses <see cref="P:System.DateTime.UtcNow"/> when <see cref="P:System.DateTime.Kind"/> is <see cref="F:System.DateTimeKind.Utc"/>
+            or <see cref="F:System.DateTimeKind.Unspecified"/>; only <see cref="F:System.DateTimeKind.Local"/> compares against
+            <see cref="P:System.DateTime.Now"/>.
+            </remarks>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the <see cref="T:System.DateTime"/> to check.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is later than the current date and time.</exception>
+            <example>
+            <code language="csharp">
+            DateTime dateOfBirth = Guard.Against(dateOfBirth).InTheFuture().Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.DateTimeGuardClauseExtensions.InTheFuture(MyOrg.Elements.Guards.GuardClause{System.DateTimeOffset})">
+            <summary>Throws <see cref="T:System.ArgumentOutOfRangeException"/> when the offset-aware value is in the future relative to <see cref="P:System.DateTimeOffset.UtcNow"/>.</summary>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the <see cref="T:System.DateTimeOffset"/> to check.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is later than <see cref="P:System.DateTimeOffset.UtcNow"/>.</exception>
+            <example>
+            <code language="csharp">
+            DateTimeOffset createdAt = Guard.Against(createdAt).InTheFuture().Value;
+            </code>
+            </example>
+        </member>
+        <member name="T:MyOrg.Elements.Guards.EnumGuardClauseExtensions">
+            <summary>
+            Guard-clause extensions for <see cref="T:System.Enum"/> arguments.
+            </summary>
+            <example>
+            <code language="csharp">
+            OrderStatus status = Guard.Against(status).InvalidEnum().Value;
+            DayOfWeek day = Guard.Against(day).InvalidEnum().Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.EnumGuardClauseExtensions.InvalidEnum``1(MyOrg.Elements.Guards.GuardClause{``0})">
+            <summary>Throws <see cref="T:System.ArgumentOutOfRangeException"/> when the enum value is not a defined member of <typeparamref name="TEnum"/>.</summary>
+            <typeparam name="TEnum">The enum type whose defined members are validated against.</typeparam>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the enum value to check.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is not a defined member of <typeparamref name="TEnum"/>.</exception>
+            <example>
+            <code language="csharp">
+            Status status = Guard.Against(status).InvalidEnum().Value;
+            </code>
+            </example>
+        </member>
+        <member name="T:MyOrg.Elements.Guards.Guard">
+            <summary>
+            Entry point for fluent guard-clause checks against method/constructor arguments.
+            </summary>
+            <example>
+            <code language="csharp">
+            public Person(string name, int age, DateTime dateOfBirth) {
+                Name = Guard.Against(name).NullOrEmpty().LongerThan(100).Value;
+                Age  = Guard.Against(age).Negative().GreaterThan(150).Value;
+                DateOfBirth = Guard.Against(dateOfBirth).Default().InTheFuture().Value;
+            }
+            </code>
+            </example>
+            <remarks>
+            The single open generic <see cref="M:MyOrg.Elements.Guards.Guard.Against``1(``0,System.String)"/> overload preserves the
+            caller's compile-time type — including its nullability annotation. This means
+            <list type="bullet">
+              <item>callers compiled with <c>&lt;Nullable&gt;disable&lt;/Nullable&gt;</c>
+                (null-oblivious) get an oblivious carrier and see no nullability warnings;</item>
+              <item><c>var</c>-typed locals work for any type — no need to widen
+                <c>List&lt;int&gt;</c> to <c>IEnumerable&lt;int&gt;?</c> or to add a <c>?</c>
+                just to satisfy a constrained extension method.</item>
+            </list>
+            </remarks>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.Guard.Against``1(``0,System.String)">
+            <summary>
+            Begins a fluent guard-clause chain for the supplied <paramref name="value"/>.
+            The argument's source-text expression is captured automatically and used as
+            the parameter name on any thrown <see cref="T:System.ArgumentException"/> (or derived type).
+            </summary>
+            <typeparam name="T">Type of the value being guarded. Inferred from <paramref name="value"/>.</typeparam>
+            <param name="value">The value to guard against invalid states.</param>
+            <param name="parameterName">
+            Captured automatically via <see cref="T:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute"/>.
+            Callers should rarely supply this explicitly.
+            </param>
+            <returns>A <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping <paramref name="value"/>, ready for chaining further guard checks.</returns>
+            <example>
+            <code language="csharp">
+            string name = Guard.Against(name).NullOrEmpty().LongerThan(100).Value;
+            </code>
+            </example>
+        </member>
+        <member name="T:MyOrg.Elements.Guards.GuardClause`1">
+             <summary>
+             Lightweight, allocation-free carrier used by the fluent <see cref="T:MyOrg.Elements.Guards.Guard"/> API.
+             Each guard extension validates the wrapped <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> and returns a
+             <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> so that further checks can be chained.
+             </summary>
+             <typeparam name="T">Type of the value being guarded.</typeparam>
+             <example>
+             <code language="csharp">
+             // Typically created via Guard.Against; rarely instantiated directly.
+             string name = Guard.Against(rawName).NullOrEmpty().LongerThan(100).Value;
+             int age = Guard.Against(rawAge).Negative().GreaterThan(150).Value;
+            
+             // Implicit conversion to T is available at the end of a chain:
+             string validated = Guard.Against(rawName).NullOrEmpty();
+             </code>
+             </example>
+        </member>
+        <member name="P:MyOrg.Elements.Guards.GuardClause`1.Value">
+            <summary>Gets the value being guarded.</summary>
+        </member>
+        <member name="P:MyOrg.Elements.Guards.GuardClause`1.ParameterName">
+            <summary>
+            Gets the captured parameter name used when throwing argument exceptions.
+            Always non-null; if the caller supplied <c>null</c> (or the
+            <see cref="T:System.Runtime.CompilerServices.CallerArgumentExpressionAttribute"/> capture failed) this is
+            normalised to <c>"value"</c> at construction time so downstream guard
+            extensions never have to deal with a null parameter name.
+            </summary>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.GuardClause`1.op_Implicit(MyOrg.Elements.Guards.GuardClause{`0})~`0">
+            <summary>
+            Implicitly unwraps the guarded value, allowing terminal use of the chain in
+            constructors and field initializers without an explicit <c>.Value</c>.
+            </summary>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> whose value is unwrapped.</param>
+            <returns>The guarded value contained in <paramref name="guard"/>.</returns>
+            <example>
+            <code language="csharp">
+            // Implicit conversion eliminates the explicit .Value at the end of the chain:
+            string name = Guard.Against(rawName).NullOrEmpty().LongerThan(100);
+            </code>
+            </example>
+        </member>
+        <member name="T:MyOrg.Elements.Guards.NumericGuardClauseExtensions">
+            <summary>
+            Guard-clause extensions for numeric types implementing <see cref="T:System.Numerics.INumberBase`1"/>
+            (covers <see cref="T:System.Int32"/>, <see cref="T:System.Int64"/>, <see cref="T:System.Int16"/>, <see cref="T:System.Byte"/>,
+            <see cref="T:System.Single"/>, <see cref="T:System.Double"/>, <see cref="T:System.Decimal"/>, <see cref="T:System.Numerics.BigInteger"/>, etc.).
+            </summary>
+            <example>
+            <code language="csharp">
+            int count = Guard.Against(count).Negative().Value;
+            int quantity = Guard.Against(quantity).NegativeOrZero().Value;
+            int divisor = Guard.Against(divisor).Zero().Value;
+            int offset = Guard.Against(offset).Positive().Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.NumericGuardClauseExtensions.Negative``1(MyOrg.Elements.Guards.GuardClause{``0})">
+            <summary>Throws <see cref="T:System.ArgumentOutOfRangeException"/> when the number is negative.</summary>
+            <typeparam name="T">The numeric type, which must implement <see cref="T:System.Numerics.INumberBase`1"/>.</typeparam>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the numeric value to check.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is negative.</exception>
+            <example>
+            <code language="csharp">
+            int count = Guard.Against(count).Negative().Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.NumericGuardClauseExtensions.NegativeOrZero``1(MyOrg.Elements.Guards.GuardClause{``0})">
+            <summary>Throws <see cref="T:System.ArgumentOutOfRangeException"/> when the number is negative or zero.</summary>
+            <typeparam name="T">The numeric type, which must implement <see cref="T:System.Numerics.INumberBase`1"/>.</typeparam>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the numeric value to check.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is negative or zero.</exception>
+            <example>
+            <code language="csharp">
+            int quantity = Guard.Against(quantity).NegativeOrZero().Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.NumericGuardClauseExtensions.Positive``1(MyOrg.Elements.Guards.GuardClause{``0})">
+            <summary>Throws <see cref="T:System.ArgumentOutOfRangeException"/> when the number is positive (non-zero).</summary>
+            <typeparam name="T">The numeric type, which must implement <see cref="T:System.Numerics.INumberBase`1"/>.</typeparam>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the numeric value to check.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is positive and non-zero.</exception>
+            <example>
+            <code language="csharp">
+            int offset = Guard.Against(offset).Positive().Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.NumericGuardClauseExtensions.Zero``1(MyOrg.Elements.Guards.GuardClause{``0})">
+            <summary>Throws <see cref="T:System.ArgumentOutOfRangeException"/> when the number is zero.</summary>
+            <typeparam name="T">The numeric type, which must implement <see cref="T:System.Numerics.INumberBase`1"/>.</typeparam>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the numeric value to check.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is zero.</exception>
+            <example>
+            <code language="csharp">
+            int divisor = Guard.Against(divisor).Zero().Value;
+            </code>
+            </example>
+        </member>
+        <member name="T:MyOrg.Elements.Guards.ObjectGuardClauseExtensions">
+            <summary>
+            Guard-clause extensions that apply to any reference- or value-typed argument:
+            null checks (including <see cref="T:System.Nullable`1"/>) and default-value checks.
+            </summary>
+            <example>
+            <code language="csharp">
+            string name = Guard.Against(name).Null().Value;
+            Guid id = Guard.Against(id).Default().Value;
+            int? count = Guard.Against(count).Null().Negative().Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.ObjectGuardClauseExtensions.Null``1(MyOrg.Elements.Guards.GuardClause{``0})">
+            <summary>Throws <see cref="T:System.ArgumentNullException"/> when the guarded reference is <c>null</c>.</summary>
+            <typeparam name="T">The reference type of the guarded value.</typeparam>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the value to check.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is <c>null</c>.</exception>
+            <remarks>Carrier annotation is preserved; the runtime check is what matters here.</remarks>
+            <example>
+            <code language="csharp">
+            string name = Guard.Against(name).Null().LongerThan(100).Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.ObjectGuardClauseExtensions.Null``1(MyOrg.Elements.Guards.GuardClause{System.Nullable{``0}})">
+            <summary>
+            Throws <see cref="T:System.ArgumentNullException"/> when the guarded <see cref="T:System.Nullable`1"/> has no value.
+            Refines the carrier to a non-nullable <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/>.
+            </summary>
+            <typeparam name="T">The underlying value type of the nullable guarded value.</typeparam>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the nullable value to check.</param>
+            <returns>A non-nullable <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the unwrapped value, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> has no value.</exception>
+            <example>
+            <code language="csharp">
+            int value = Guard.Against(nullableInt).Null().Negative().Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.ObjectGuardClauseExtensions.Default``1(MyOrg.Elements.Guards.GuardClause{``0})">
+            <summary>Throws <see cref="T:System.ArgumentException"/> when the value equals <c>default(T)</c>.</summary>
+            <typeparam name="T">The value type of the guarded value.</typeparam>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the value to check.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> equals <c>default(T)</c>.</exception>
+            <remarks>
+            Constrained to value types since <c>default</c> for a reference type is <c>null</c>,
+            which is the responsibility of <see cref="M:MyOrg.Elements.Guards.ObjectGuardClauseExtensions.Null``1(MyOrg.Elements.Guards.GuardClause{``0})"/>.
+            </remarks>
+            <example>
+            <code language="csharp">
+            Guid id = Guard.Against(id).Default().Value;
+            </code>
+            </example>
+        </member>
+        <member name="T:MyOrg.Elements.Guards.StringGuardClauseExtensions">
+            <summary>
+            Guard-clause extensions for <see cref="T:System.String"/> arguments.
+            </summary>
+            <remarks>
+            Each null-checking method is provided in two shapes:
+            <list type="bullet">
+              <item>a primary overload that accepts <c>GuardClause&lt;string?&gt;</c> for callers
+                whose value is statically nullable;</item>
+              <item>a complementary overload (using the <c>in</c> modifier so the IL signature
+                differs) that accepts <c>GuardClause&lt;string&gt;</c> for callers passing a
+                statically non-nullable string — most commonly literals or <c>var</c>-typed
+                locals after flow-narrowing.</item>
+            </list>
+            This pair keeps both nullable-aware and null-oblivious callers free of the
+            CS8620 generic-struct-invariance warning.
+            </remarks>
+            <example>
+            <code language="csharp">
+            string name = Guard.Against(name).NullOrEmpty().LongerThan(100).Value;
+            string description = Guard.Against(description).NullOrWhiteSpace().LongerThan(500).Value;
+            string code = Guard.Against(code).Empty().Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.StringGuardClauseExtensions.NullOrEmpty(MyOrg.Elements.Guards.GuardClause{System.String})">
+            <summary>Throws when the string is <c>null</c> or empty, returning a non-nullable carrier on success.</summary>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the nullable string to check.</param>
+            <returns>A non-nullable <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the validated string, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is <c>null</c>.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is an empty string.</exception>
+            <example>
+            <code language="csharp">
+            string name = Guard.Against(name).NullOrEmpty().LongerThan(100).Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.StringGuardClauseExtensions.NullOrEmpty(MyOrg.Elements.Guards.GuardClause{System.String}@)">
+            <summary>
+            Convenience overload that accepts a non-nullable carrier (e.g. for literal
+            strings or flow-narrowed locals). Uses <c>in</c> + <see cref="T:System.Runtime.CompilerServices.OverloadResolutionPriorityAttribute"/>
+            to coexist with <see cref="M:MyOrg.Elements.Guards.StringGuardClauseExtensions.NullOrEmpty(MyOrg.Elements.Guards.GuardClause{System.String})"/> and to be selected
+            when the call site has a non-nullable carrier (avoiding CS8620 invariance warnings).
+            Includes a defensive null check in case nullability annotations are circumvented.
+            </summary>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the non-nullable string to check.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is <c>null</c> despite the non-nullable annotation.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is an empty string.</exception>
+            <example>
+            <code language="csharp">
+            string name = Guard.Against(name).NullOrEmpty().LongerThan(100).Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.StringGuardClauseExtensions.NullOrWhiteSpace(MyOrg.Elements.Guards.GuardClause{System.String})">
+            <summary>Throws when the string is <c>null</c>, empty, or whitespace, returning a non-nullable carrier on success.</summary>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the nullable string to check.</param>
+            <returns>A non-nullable <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the validated string, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is <c>null</c>.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is empty or contains only whitespace.</exception>
+            <example>
+            <code language="csharp">
+            string description = Guard.Against(description).NullOrWhiteSpace().LongerThan(500).Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.StringGuardClauseExtensions.NullOrWhiteSpace(MyOrg.Elements.Guards.GuardClause{System.String}@)">
+            <summary>Convenience overload accepting a non-nullable carrier; see <see cref="M:MyOrg.Elements.Guards.StringGuardClauseExtensions.NullOrWhiteSpace(MyOrg.Elements.Guards.GuardClause{System.String})"/> for full documentation.</summary>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the non-nullable string to check.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is <c>null</c> despite the non-nullable annotation.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is empty or contains only whitespace.</exception>
+            <example>
+            <code language="csharp">
+            string description = Guard.Against(description).NullOrWhiteSpace().LongerThan(500).Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.StringGuardClauseExtensions.Empty(MyOrg.Elements.Guards.GuardClause{System.String})">
+            <summary>Throws <see cref="T:System.ArgumentException"/> when the non-null string is empty.</summary>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the non-null string to check.</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is an empty string.</exception>
+            <example>
+            <code language="csharp">
+            string name = Guard.Against(name).Empty().LongerThan(100).Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.StringGuardClauseExtensions.LongerThan(MyOrg.Elements.Guards.GuardClause{System.String},System.Int32)">
+            <summary>Throws <see cref="T:System.ArgumentOutOfRangeException"/> when the string length exceeds <paramref name="maxLength"/>.</summary>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the string to check.</param>
+            <param name="maxLength">The maximum allowable string length (inclusive).</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when the length of <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> exceeds <paramref name="maxLength"/>.</exception>
+            <example>
+            <code language="csharp">
+            string name = Guard.Against(name).NullOrEmpty().LongerThan(100).Value;
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Guards.StringGuardClauseExtensions.ShorterThan(MyOrg.Elements.Guards.GuardClause{System.String},System.Int32)">
+            <summary>Throws <see cref="T:System.ArgumentOutOfRangeException"/> when the string length is below <paramref name="minLength"/>.</summary>
+            <param name="guard">The <see cref="T:MyOrg.Elements.Guards.GuardClause`1"/> wrapping the string to check.</param>
+            <param name="minLength">The minimum required string length (inclusive).</param>
+            <returns>The input <paramref name="guard"/> unchanged, enabling further chaining.</returns>
+            <exception cref="T:System.ArgumentOutOfRangeException">Thrown when the length of <see cref="P:MyOrg.Elements.Guards.GuardClause`1.Value"/> is below <paramref name="minLength"/>.</exception>
+            <example>
+            <code language="csharp">
+            string code = Guard.Against(code).NullOrEmpty().ShorterThan(3).LongerThan(10).Value;
+            </code>
+            </example>
+        </member>
+        <member name="T:MyOrg.Elements.IClock">
+             <summary>
+             Abstraction over the system clock that exposes only static members, enabling
+             deterministic time-based testing via generic type parameters constrained to
+             <see cref="T:MyOrg.Elements.IClock"/>.
+             </summary>
+             <remarks>
+             Production code should depend on a type parameter <c>TClock</c> constrained to
+             <see cref="T:MyOrg.Elements.IClock"/> (e.g. <c>where TClock : IClock</c>) rather than directly using
+             <see cref="P:System.DateTime.UtcNow"/> or <see cref="P:System.DateTimeOffset.UtcNow"/> so that tests can
+             substitute a fixed-time implementation. Use <see cref="T:MyOrg.Elements.SystemClock"/> in production.
+             </remarks>
+             <example>
+             <code language="csharp">
+             // Define a service that takes the clock as a generic type parameter for testability:
+             public sealed class OrderService&lt;TClock&gt; where TClock : IClock
+             {
+                 public Order CreateOrder(string productId) =&gt; new Order
+                 {
+                     ProductId = productId,
+                     CreatedAt = TClock.UtcNow
+                 };
+             }
+            
+             // Use SystemClock in production:
+             var service = new OrderService&lt;SystemClock&gt;();
+            
+             // Inject a fixed-time clock in tests via a test double:
+             // var testService = new OrderService&lt;FakeClock&gt;();
+             </code>
+             </example>
+        </member>
+        <member name="P:MyOrg.Elements.IClock.UtcNow">
+            <summary>Gets the current UTC time as a <see cref="T:System.DateTime"/> with <see cref="F:System.DateTimeKind.Utc"/>.</summary>
+        </member>
+        <member name="P:MyOrg.Elements.IClock.UtcNowOffset">
+            <summary>Gets the current UTC time as a <see cref="T:System.DateTimeOffset"/>.</summary>
+        </member>
+        <member name="T:MyOrg.Elements.Mapping.ITypeMapper`2">
+             <summary>
+             Maps types from one representation to another.
+             </summary>
+             <typeparam name="TSource">The source type to map from.</typeparam>
+             <typeparam name="TDestination">The destination type to map to.</typeparam>
+             <example>
+             <code language="csharp">
+             public sealed class ProductEntityToDtoMapper : ITypeMapper&lt;ProductEntity, ProductDto&gt;
+             {
+                 public ProductDto Map(ProductEntity source) => new()
+                 {
+                     Name = source.Name,
+                     Price = source.Price
+                 };
+            
+                 public void Project(ProductEntity source, ProductDto destination)
+                 {
+                     destination.Name = source.Name;
+                     destination.Price = source.Price;
+                 }
+             }
+             </code>
+             </example>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.ITypeMapper`2.Map(`0)">
+            <summary>
+            Maps an instance of <typeparamref name="TSource"/> to <typeparamref name="TDestination"/>.
+            </summary>
+            <param name="source">The source instance to map.</param>
+            <returns>The mapped instance of <typeparamref name="TDestination"/>.</returns>
+            <example>
+            Given an <c>ProductEntityToDtoMapper</c> that implements <c>ITypeMapper{ProductEntity, ProductDto}</c>, the following maps a <c>ProductEntity</c> instance to a new <c>ProductDto</c> instance:
+            <code>
+            var mapper = new ProductEntityToDtoMapper();
+            var theDto = mapper.Map(productEntity);
+            </code>
+            </example>
+            <example>
+            Creating a type mapper for a source/destination pair is as simple as implementing <c>ITypeMapper{TSource, TDestination}</c>:
+            <code>
+            public class ProductEntityToDtoMapper : ITypeMapper&lt;ProductEntity, ProductDto&gt;
+            {
+              public ProductDto Map(ProductEntity source)
+              {
+                return new ProductDto {
+                    Name = source.Name,
+                    Price = source.Price
+                };
+              }
+              public void Project(ProductEntity source, ProductDto destination)
+              {
+                destination.Name = source.Name;
+                destination.Price = source.Price;
+              }
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.ITypeMapper`2.Project(`0,`1)">
+            <summary>
+            Projects the values from the source instance onto the destination instance.
+            </summary>
+            <param name="source">The source instance to project from.</param>
+            <param name="destination">The destination instance to project onto.</param>
+            <example>
+            Given an <c>ProductEntityToDtoMapper</c> that implements <c>ITypeMapper{ProductEntity, ProductDto}</c>, the following projects a <c>ProductEntity</c> instance onto an existing <c>ProductDto</c> instance:
+            <code>
+            var mapper = new ProductEntityToDtoMapper();
+            mapper.Project(productEntity, existingProductDto);
+            </code>
+            </example>
+            <example>
+            Implementing the <c>Project</c> method is optional; if not implemented, the <c>TypeMappingService</c> will fall back to mapping to a new instance and copying over the values via reflection:
+            <code>
+            public class ProductEntityToDtoMapper : ITypeMapper&lt;ProductEntity, ProductDto&gt;
+            {
+                public void Project(ProductEntity source, ProductDto destination) {
+                    destination.Name = source.Name;
+                    destination.Price = source.Price;
+                }
+            }
+            </code>
+            </example>
+        </member>
+        <member name="T:MyOrg.Elements.Mapping.ITypeMappingService">
+             <summary>
+             Central service for resolving <see cref="T:MyOrg.Elements.Mapping.ITypeMapper`2"/> instances
+             and mapping single objects or collections between type representations.
+             </summary>
+             <remarks>
+             Registration is an implementation concern and lives on the concrete
+             <c>TypeMappingService</c> (and the service-collection extensions), not on this
+             abstraction.
+             </remarks>
+             <example>
+             <code language="csharp">
+             ITypeMappingService mapping = serviceProvider.GetRequiredService&lt;ITypeMappingService&gt;();
+            
+             if (mapping.HasMapper&lt;ProductEntity, ProductDto&gt;())
+             {
+                 ProductDto dto = mapping.Map&lt;ProductEntity, ProductDto&gt;(entity);
+                 List&lt;ProductDto&gt; dtos = mapping.MapToList&lt;ProductEntity, ProductDto&gt;(entities);
+             }
+             </code>
+             </example>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.ITypeMappingService.HasMapper``2">
+            <summary>
+            Returns <see langword="true"/> when a mapper can be resolved for the
+            <typeparamref name="TSource"/> → <typeparamref name="TDestination"/> pair, either via
+            an exact match or via the inheritance-hierarchy fallback.
+            </summary>
+            <example>
+            Given a registered mapper for ProductEntity → ProductDto, the following returns <see langword="true"/>:
+            <code>
+            mappingService.HasMapper&lt;ProductEntity, ProductDto&gt;();
+            mappingService.HasMapper&lt;SpecialProductEntity, ProductDto&gt;();
+            </code>
+            </example>
+            <typeparam name="TSource">The source type.</typeparam>
+            <typeparam name="TDestination">The destination type.</typeparam>
+            <returns><see langword="true"/> when a mapper is registered for the pair (exactly or via fallback); otherwise <see langword="false"/>.</returns>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.ITypeMappingService.TryGetMapper``2">
+            <summary>
+            Returns the registered <see cref="T:MyOrg.Elements.Mapping.ITypeMapper`2"/> for the pair,
+            or <see langword="null"/> when no mapper has been registered.
+            </summary>
+            <example>
+            Given a registered mapper for ProductEntity → ProductDto, the following returns the mapper instance:
+            <code>
+            mappingService.TryGetMapper&lt;ProductEntity, ProductDto&gt;();
+            </code>
+            </example>
+            <typeparam name="TSource">The source type.</typeparam>
+            <typeparam name="TDestination">The destination type.</typeparam>
+            <returns>The resolved mapper, or <see langword="null"/> when no mapper is registered for the pair.</returns>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.ITypeMappingService.GetMapper``2">
+            <summary>
+            Returns the registered <see cref="T:MyOrg.Elements.Mapping.ITypeMapper`2"/> for the pair.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            No mapper is registered for the <typeparamref name="TSource"/> →
+            <typeparamref name="TDestination"/> pair.
+            </exception>
+            <example>
+            Given a registered mapper for ProductEntity → ProductDto, the following returns the mapper instance:
+            <code>
+            var mapper = mappingService.GetMapper&lt;ProductEntity, ProductDto&gt;();
+            var theDto = mapper.Map(productEntity);
+            </code>
+            </example>
+            <typeparam name="TSource">The source type.</typeparam>
+            <typeparam name="TDestination">The destination type.</typeparam>
+            <returns>The resolved mapper for the pair.</returns>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.ITypeMappingService.Map``2(``0)">
+            <summary>
+            Maps <paramref name="source"/> to a new instance of
+            <typeparamref name="TDestination"/> using the registered mapper.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            No mapper is registered for the pair.
+            </exception>
+            <example>
+            Given a registered mapper for ProductEntity → ProductDto, the following maps a ProductEntity instance to a new ProductDto instance:
+            <code>
+            var theDto = mappingService.Map&lt;ProductEntity, ProductDto&gt;(productEntity);
+            </code>
+            </example>
+            <typeparam name="TSource">The source type.</typeparam>
+            <typeparam name="TDestination">The destination type.</typeparam>
+            <param name="source">The source instance to map.</param>
+            <returns>A new <typeparamref name="TDestination"/> produced by the registered mapper.</returns>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.ITypeMappingService.TryMap``2(``0)">
+            <summary>
+            Attempts to map <paramref name="source"/> to a new
+            <typeparamref name="TDestination"/> instance, returning the default value of
+            <typeparamref name="TDestination"/> when no mapper is registered for the pair.
+            </summary>
+            <typeparam name="TSource">The source type.</typeparam>
+            <typeparam name="TDestination">The destination type.</typeparam>
+            <param name="source">The source instance to map.</param>
+            <returns>
+            The mapped value, or <c>default(TDestination)</c> when no mapper is registered for the
+            <typeparamref name="TSource"/> → <typeparamref name="TDestination"/> pair.
+            </returns>
+            <remarks>
+            Use <see cref="M:MyOrg.Elements.Mapping.ITypeMappingService.Map``2(``0)"/> when a missing mapper indicates a
+            programmer error and you want a thrown exception. Use <c>TryMap</c> when the absence
+            of a mapper is an acceptable runtime condition.
+            </remarks>
+            <example>
+            <code language="csharp">
+            ProductDto? dto = mappingService.TryMap&lt;ProductEntity, ProductDto&gt;(entity);
+            if (dto is not null) { /* … */ }
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.ITypeMappingService.Project``2(``0,``1)">
+            <summary>
+            Projects the values of <paramref name="source"/> onto an existing
+            <paramref name="destination"/> instance using the registered mapper.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            No mapper is registered for the pair.
+            </exception>
+            <example>
+            Given a registered mapper for ProductEntity → ProductDto, the following projects a ProductEntity instance onto an existing ProductDto instance:
+            <code>
+            mappingService.Project&lt;ProductEntity, ProductDto&gt;(productEntity, existingProductDto);
+            </code>
+            </example>
+            <typeparam name="TSource">The source type.</typeparam>
+            <typeparam name="TDestination">The destination type.</typeparam>
+            <param name="source">The source instance to project from.</param>
+            <param name="destination">The existing destination instance to project values onto.</param>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.ITypeMappingService.MapCollection``2(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Lazily maps each element of <paramref name="source"/> to
+            <typeparamref name="TDestination"/> using the registered mapper.
+            The sequence is evaluated on first enumeration.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            No mapper is registered for the pair.
+            </exception>
+            <example>
+            Given a registered mapper for ProductEntity → ProductDto, the following lazily maps a sequence of ProductEntity instances to ProductDto instances:
+            <code>
+            var dtos = mappingService.MapCollection&lt;ProductEntity, ProductDto&gt;(productEntities);
+            foreach (var dto in dtos)         /// {
+                Console.WriteLine(dto.Name);
+            }
+            </code>
+            </example>
+            <typeparam name="TSource">The source type.</typeparam>
+            <typeparam name="TDestination">The destination type.</typeparam>
+            <param name="source">The source sequence to map.</param>
+            <returns>A lazily-evaluated sequence of mapped <typeparamref name="TDestination"/> values.</returns>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.ITypeMappingService.MapToList``2(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Maps each element of <paramref name="source"/> and materializes the result as a
+            <see cref="T:System.Collections.Generic.List`1"/>.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            No mapper is registered for the pair.
+            </exception>
+            <example>
+            Given a registered mapper for ProductEntity → ProductDto, the following maps a sequence of ProductEntity instances to a List{ProductDto}:
+            <code>
+            var dtoList = mappingService.MapToList&lt;ProductEntity, ProductDto&gt;(productEntities);
+            </code>
+            </example>
+            <typeparam name="TSource">The source type.</typeparam>
+            <typeparam name="TDestination">The destination type.</typeparam>
+            <param name="source">The source sequence to map.</param>
+            <returns>A new <see cref="T:System.Collections.Generic.List`1"/> containing the mapped values.</returns>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.ITypeMappingService.MapToReadOnlyList``2(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Maps each element of <paramref name="source"/> and materializes the result as an
+            <see cref="T:System.Collections.Generic.IReadOnlyList`1"/>.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            No mapper is registered for the pair.
+            </exception>
+            <example>
+            Given a registered mapper for ProductEntity → ProductDto, the following maps a sequence of ProductEntity instances to a IReadOnlyList{ProductDto}:
+            <code>
+            var dtoList = mappingService.MapToReadOnlyList&lt;ProductEntity, ProductDto&gt;(productEntities);
+            </code>
+            </example>
+            <typeparam name="TSource">The source type.</typeparam>
+            <typeparam name="TDestination">The destination type.</typeparam>
+            <param name="source">The source sequence to map.</param>
+            <returns>A read-only list containing the mapped values.</returns>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.ITypeMappingService.MapToCollection``2(System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Maps each element of <paramref name="source"/> and materializes the result as a
+            <see cref="T:System.Collections.ObjectModel.Collection`1"/>.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">
+            No mapper is registered for the pair.
+            </exception>
+            <example>
+            Given a registered mapper for ProductEntity → ProductDto, the following maps a sequence of ProductEntity instances to a Collection{ProductDto}:
+            <code>
+            var dtoCollection = mappingService.MapToCollection&lt;ProductEntity, ProductDto&gt;(productEntities);
+            </code>
+            </example>
+            <typeparam name="TSource">The source type.</typeparam>
+            <typeparam name="TDestination">The destination type.</typeparam>
+            <param name="source">The source sequence to map.</param>
+            <returns>A new <see cref="T:System.Collections.ObjectModel.Collection`1"/> containing the mapped values.</returns>
+        </member>
+        <member name="T:MyOrg.Elements.Mapping.TypeMappingService">
+             <summary>
+             Default <see cref="T:MyOrg.Elements.Mapping.ITypeMappingService"/> implementation backed by an in-memory registry
+             of <see cref="T:MyOrg.Elements.Mapping.ITypeMapper`2"/> instances.
+             </summary>
+             <remarks>
+             <para>
+             Resolution strategy:
+             </para>
+             <list type="number">
+               <item><description>An exact <c>(TSource, TDestination)</c> match wins.</description></item>
+               <item><description>
+                 Otherwise, candidates are collected where the registered source type is assignable
+                 from <c>TSource</c> and the registered destination type is assignable to
+                 <c>TDestination</c> (exploiting the variance of
+                 <see cref="T:MyOrg.Elements.Mapping.ITypeMapper`2"/>).
+               </description></item>
+               <item><description>
+                 The candidate with the <i>closest</i> source type (fewest inheritance hops from
+                 <c>TSource</c>) wins; ties are broken by preferring the <i>most specific</i>
+                 destination type (deepest in the inheritance hierarchy).
+               </description></item>
+             </list>
+             <para>
+             CLR generic variance is required for the fallback cast, so fallback resolution is only
+             supported when both <c>TSource</c> and <c>TDestination</c> are reference types. Exact
+             matches work for value types as well.
+             </para>
+             </remarks>
+             <example>
+             <code language="csharp">
+             var service = new TypeMappingService()
+                 .Register(new ProductEntityToDtoMapper())
+                 .RegisterFromAssembly(typeof(UserEntityToDtoMapper).Assembly);
+            
+             ProductDto dto = service.Map&lt;ProductEntity, ProductDto&gt;(entity);
+             List&lt;ProductDto&gt; dtos = service.MapToList&lt;ProductEntity, ProductDto&gt;(entities);
+             </code>
+             </example>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.#ctor">
+            <summary>
+            Creates an empty <see cref="T:MyOrg.Elements.Mapping.TypeMappingService"/>.
+            </summary>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.#ctor(System.Object[])">
+            <summary>
+            Creates a <see cref="T:MyOrg.Elements.Mapping.TypeMappingService"/> pre-populated with the supplied
+            <paramref name="mappers"/>.
+            </summary>
+            <param name="mappers">
+            Mapper instances to register. Each must implement exactly one closed
+            <see cref="T:MyOrg.Elements.Mapping.ITypeMapper`2"/> interface (mappers that implement
+            multiple are registered for each closed variant).
+            </param>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="mappers"/> is <see langword="null"/>.</exception>
+            <exception cref="T:System.ArgumentException">
+            Thrown when any element of <paramref name="mappers"/> is <see langword="null"/>, or when an element
+            does not implement any closed <see cref="T:MyOrg.Elements.Mapping.ITypeMapper`2"/> interfaces.
+            </exception>
+            <example>
+            <code language="csharp">
+            var service = new TypeMappingService(
+                new ProductEntityToDtoMapper(),
+                new UserEntityToDtoMapper());
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.#ctor(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Creates a <see cref="T:MyOrg.Elements.Mapping.TypeMappingService"/> pre-populated with the supplied
+            <paramref name="mappers"/>.
+            </summary>
+            <param name="mappers">Mapper instances to register.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="mappers"/> is <see langword="null"/>.</exception>
+            <exception cref="T:System.ArgumentException">
+            Thrown when any element of <paramref name="mappers"/> is <see langword="null"/>, or when an element
+            does not implement any closed <see cref="T:MyOrg.Elements.Mapping.ITypeMapper`2"/> interfaces.
+            </exception>
+            <example>
+            <code language="csharp">
+            IEnumerable&lt;object&gt; mappers = container.ResolveAll&lt;object&gt;();
+            var service = new TypeMappingService(mappers);
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.Register``2(MyOrg.Elements.Mapping.ITypeMapper{``0,``1},System.Boolean)">
+            <summary>
+            Registers an explicit mapper for the
+            <typeparamref name="TSource"/> → <typeparamref name="TDestination"/> pair.
+            </summary>
+            <typeparam name="TDestination">Destination type.</typeparam>
+            <typeparam name="TSource">Source type.</typeparam>
+            <param name="mapper">The mapper instance.</param>
+            <param name="overwrite">When <see langword="true"/>, replaces any existing registration for the pair.</param>
+            <returns>The same service instance for fluent chaining.</returns>
+            <example>
+            <code>
+            var mappingService = new TypeMappingService()
+                .Register(new UserEntityToDtoMapper())
+                .Register(new ProductEntityToDtoMapper());
+            </code>
+            </example>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="mapper"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.RegisterFromAssembly(System.Reflection.Assembly,System.Boolean)">
+            <summary>
+            Scans <paramref name="assembly"/> and auto-registers every concrete, non-abstract
+            <see cref="T:MyOrg.Elements.Mapping.ITypeMapper`2"/> implementation found within it.
+            </summary>
+            <param name="assembly">The assembly to scan.</param>
+            <param name="overwrite">When <see langword="true"/>, duplicate pairs replace existing registrations.</param>
+            <returns>The same service instance for fluent chaining.</returns>
+            <example>
+            <code>
+            var mappingService = new TypeMappingService()
+                .RegisterFromAssembly(typeof(UserEntityToDtoMapper).Assembly);
+            </code>
+            </example>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="assembly"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.RegisterFromAssemblies(System.Collections.Generic.IEnumerable{System.Reflection.Assembly},System.Boolean)">
+            <summary>
+            Scans each of <paramref name="assemblies"/> and auto-registers every concrete,
+            non-abstract <see cref="T:MyOrg.Elements.Mapping.ITypeMapper`2"/> implementation found.
+            </summary>
+            <param name="assemblies">The assemblies to scan.</param>
+            <param name="overwrite">When <see langword="true"/>, duplicate pairs replace existing registrations.</param>
+            <returns>The same service instance for fluent chaining.</returns>
+            <example>
+            <code>
+            var mappingService = new TypeMappingService()
+                .RegisterFromAssemblies(new[] { typeof(UserEntityToDtoMapper).Assembly, typeof(ProductEntityToDtoMapper).Assembly });
+            </code>
+            </example>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="assemblies"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.RegisterFromLoadedAssemblies(System.Boolean)">
+            <summary>
+            Scans every currently loaded assembly in the current <see cref="T:System.AppDomain"/> and
+            auto-registers every concrete, non-abstract
+            <see cref="T:MyOrg.Elements.Mapping.ITypeMapper`2"/> implementation found. Dynamic
+            assemblies are skipped.
+            </summary>
+            <param name="overwrite">When <see langword="true"/>, duplicate pairs replace existing registrations.</param>
+            <returns>The same service instance for fluent chaining.</returns>
+            <example>
+            <code>
+            var mappingService = new TypeMappingService()
+                .RegisterFromLoadedAssemblies();
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.HasMapper``2">
+            <inheritdoc/>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.TryGetMapper``2">
+            <inheritdoc/>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.GetMapper``2">
+            <inheritdoc/>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.Map``2(``0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.TryMap``2(``0)">
+            <inheritdoc/>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.Project``2(``0,``1)">
+            <inheritdoc/>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.MapCollection``2(System.Collections.Generic.IEnumerable{``0})">
+            <inheritdoc/>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.MapToList``2(System.Collections.Generic.IEnumerable{``0})">
+            <inheritdoc/>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.MapToReadOnlyList``2(System.Collections.Generic.IEnumerable{``0})">
+            <inheritdoc/>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.MapToCollection``2(System.Collections.Generic.IEnumerable{``0})">
+            <inheritdoc/>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.RegisterInstance(System.Object,System.Boolean)">
+            <summary>
+            Registers <paramref name="mapper"/> against every closed
+            <see cref="T:MyOrg.Elements.Mapping.ITypeMapper`2"/> interface it implements. Intended for
+            scenarios (e.g., DI-based composition) where the exact closed generic arguments are
+            not known at the call site.
+            </summary>
+            <param name="mapper">The mapper instance.</param>
+            <param name="overwrite">When <see langword="true"/>, replaces any existing registration for the pair.</param>
+            <example>
+            <code>
+            var mappingService = new TypeMappingService();
+            mappingService.RegisterInstance(new UserEntityToDtoMapper());
+            mappingService.RegisterInstance(new ProductEntityToDtoMapper());
+            </code>
+            </example>
+            <exception cref="T:System.ArgumentException">
+            Thrown when <paramref name="mapper"/> does not implement any closed
+            <see cref="T:MyOrg.Elements.Mapping.ITypeMapper`2"/> interfaces.
+            </exception>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="mapper"/> is <see langword="null"/>.</exception>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.BuildVarianceAdapter(System.Object,System.Type,System.Type,System.Type,System.Type)">
+            <summary>
+            Builds a typed adapter that exposes a registered mapper (with types
+            <paramref name="regSrc"/> → <paramref name="regDst"/>) as the requested pair
+            (<paramref name="reqSrc"/> → <paramref name="reqDst"/>). The CLR can't supply the
+            cast directly because <c>ITypeMapper</c> is invariant on its destination parameter
+            (<c>Project</c> uses it in an input position).
+            </summary>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.SourceDistance(System.Type,System.Type)">
+            <summary>
+            Returns the number of inheritance hops from <paramref name="derived"/> up to
+            <paramref name="ancestor"/>. Interfaces are given a large constant offset so that
+            concrete base-class matches are preferred over interface matches.
+            </summary>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingService.InheritanceDepth(System.Type)">
+            <summary>
+            Returns a non-negative value approximating how specific (deep in the inheritance
+            hierarchy) <paramref name="type"/> is. Higher = more specific.
+            </summary>
+        </member>
+        <member name="T:MyOrg.Elements.Mapping.TypeMappingService.VarianceAdapter`4">
+            <summary>
+            Adapts an <see cref="T:MyOrg.Elements.Mapping.ITypeMapper`2"/> so it can be consumed as an
+            <see cref="T:MyOrg.Elements.Mapping.ITypeMapper`2"/>, where <typeparamref name="TReqSrc"/>
+            derives from <typeparamref name="TRegSrc"/> and <typeparamref name="TRegDst"/>
+            derives from <typeparamref name="TReqDst"/>.
+            </summary>
+            <remarks>
+            <para><c>Map</c> is always safe: the requested source upcasts to the registered
+            source, and the registered destination upcasts to the requested destination.</para>
+            <para><c>Project</c> requires the runtime type of <c>destination</c> to be
+            assignable to <typeparamref name="TRegDst"/>. An
+            <see cref="T:System.InvalidCastException"/> is thrown otherwise.</para>
+            </remarks>
+        </member>
+        <member name="T:MyOrg.Elements.Mapping.TypeMappingServiceCollectionExtensions">
+             <summary>
+             Service-collection extensions for registering <see cref="T:MyOrg.Elements.Mapping.ITypeMappingService"/> and
+             auto-discovering <see cref="T:MyOrg.Elements.Mapping.ITypeMapper`2"/> implementations.
+             </summary>
+             <example>
+             <code language="csharp">
+             services
+                 .AddTypeMappersFromAssembly(typeof(ProductEntityToDtoMapper).Assembly)
+                 .AddTypeMapping();
+            
+             // Resolved at the layer boundary:
+             var mapping = serviceProvider.GetRequiredService&lt;ITypeMappingService&gt;();
+             ProductDto dto = mapping.Map&lt;ProductEntity, ProductDto&gt;(entity);
+             </code>
+             </example>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingServiceCollectionExtensions.AddTypeMapping(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{MyOrg.Elements.Mapping.TypeMappingService})">
+            <summary>
+            Registers <see cref="T:MyOrg.Elements.Mapping.TypeMappingService"/> as a singleton <see cref="T:MyOrg.Elements.Mapping.ITypeMappingService"/>.
+            Mappers registered via <see cref="M:MyOrg.Elements.Mapping.TypeMappingServiceCollectionExtensions.AddTypeMappersFromAssembly(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Reflection.Assembly)"/>,
+            <see cref="M:MyOrg.Elements.Mapping.TypeMappingServiceCollectionExtensions.AddTypeMappersFromAssemblies(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Collections.Generic.IEnumerable{System.Reflection.Assembly})"/>, or
+            <see cref="M:MyOrg.Elements.Mapping.TypeMappingServiceCollectionExtensions.AddTypeMappersFromLoadedAssemblies(Microsoft.Extensions.DependencyInjection.IServiceCollection)"/> are folded in automatically;
+            <paramref name="configure"/> runs last so it may add or override entries.
+            </summary>
+            <param name="services">The service collection to register the mapping service with.</param>
+            <param name="configure">Optional callback invoked after DI-discovered mappers have been folded in, allowing additional registration or overrides.</param>
+            <returns>The same <paramref name="services"/> instance for fluent chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="services"/> is <see langword="null"/>.</exception>
+            <example>
+            <code language="csharp">
+            services.AddTypeMapping(svc =&gt;
+            {
+                svc.Register(new ProductEntityToDtoMapper(), overwrite: true);
+            });
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingServiceCollectionExtensions.AddTypeMappersFromAssembly(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Reflection.Assembly)">
+            <summary>
+            Discovers every concrete, non-abstract <see cref="T:MyOrg.Elements.Mapping.ITypeMapper`2"/>
+            implementation in <paramref name="assembly"/> and registers each as a singleton with
+            the DI container. <see cref="M:MyOrg.Elements.Mapping.TypeMappingServiceCollectionExtensions.AddTypeMapping(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{MyOrg.Elements.Mapping.TypeMappingService})"/> picks them up automatically.
+            </summary>
+            <param name="services">The service collection to register mappers with.</param>
+            <param name="assembly">The assembly to scan for mapper implementations.</param>
+            <returns>The same <paramref name="services"/> instance for fluent chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="services"/> or <paramref name="assembly"/> is <see langword="null"/>.</exception>
+            <example>
+            <code language="csharp">
+            services.AddTypeMappersFromAssembly(typeof(ProductEntityToDtoMapper).Assembly);
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingServiceCollectionExtensions.AddTypeMappersFromAssemblies(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Collections.Generic.IEnumerable{System.Reflection.Assembly})">
+            <summary>
+            Discovers every concrete, non-abstract <see cref="T:MyOrg.Elements.Mapping.ITypeMapper`2"/>
+            implementation across <paramref name="assemblies"/> and registers each as a singleton.
+            </summary>
+            <param name="services">The service collection to register mappers with.</param>
+            <param name="assemblies">The assemblies to scan for mapper implementations. <see langword="null"/> entries are skipped.</param>
+            <returns>The same <paramref name="services"/> instance for fluent chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="services"/> or <paramref name="assemblies"/> is <see langword="null"/>.</exception>
+            <example>
+            <code language="csharp">
+            services.AddTypeMappersFromAssemblies(new[]
+            {
+                typeof(ProductEntityToDtoMapper).Assembly,
+                typeof(UserEntityToDtoMapper).Assembly
+            });
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMappingServiceCollectionExtensions.AddTypeMappersFromLoadedAssemblies(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Discovers mappers across every non-dynamic assembly currently loaded into the
+            <see cref="T:System.AppDomain"/>.
+            </summary>
+            <param name="services">The service collection to register mappers with.</param>
+            <returns>The same <paramref name="services"/> instance for fluent chaining.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="services"/> is <see langword="null"/>.</exception>
+            <example>
+            <code language="csharp">
+            services.AddTypeMappersFromLoadedAssemblies().AddTypeMapping();
+            </code>
+            </example>
+        </member>
+        <member name="T:MyOrg.Elements.Mapping.TypeMapperDescriptor">
+            <summary>
+            Internal descriptor used to surface DI-registered mapper instances to
+            <see cref="T:MyOrg.Elements.Mapping.TypeMappingService"/> without re-scanning assemblies at runtime.
+            </summary>
+        </member>
+        <member name="M:MyOrg.Elements.Mapping.TypeMapperDescriptor.#ctor(System.Object)">
+            <summary>
+            Internal descriptor used to surface DI-registered mapper instances to
+            <see cref="T:MyOrg.Elements.Mapping.TypeMappingService"/> without re-scanning assemblies at runtime.
+            </summary>
+        </member>
+        <member name="T:MyOrg.Elements.Range`1">
+             <summary>
+             Represents a range of values with a specified start and end.
+             </summary>
+             <typeparam name="T">The type of the values in the range, which must implement <see cref="T:System.IComparable`1"/>.</typeparam>
+             <example>
+             <code language="csharp">
+             var inclusive = new Range&lt;int&gt;(1, 10);
+             inclusive.IsInRange(5);  // true
+             inclusive.IsInRange(10); // true
+            
+             var halfOpen = new Range&lt;int&gt;(1, 10, RangeType.ExclusiveEnd);
+             halfOpen.IsInRange(10);  // false
+             </code>
+             </example>
+        </member>
+        <member name="M:MyOrg.Elements.Range`1.#ctor(`0,`0)">
+            <summary>
+            Initializes a new <see cref="T:MyOrg.Elements.Range`1"/> as an inclusive range.
+            </summary>
+            <param name="start">The start value of the range.</param>
+            <param name="end">The end value of the range.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="start"/> or <paramref name="end"/> is <see langword="null"/>.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when <paramref name="start"/> exceeds <paramref name="end"/>.</exception>
+            <example>
+            <code language="csharp">
+            var range = new Range&lt;int&gt;(1, 10);
+            bool inRange = range.IsInRange(5); // true
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Range`1.#ctor(`0,`0,MyOrg.Elements.RangeType)">
+            <summary>
+            Initializes a new <see cref="T:MyOrg.Elements.Range`1"/> with the specified bounds and range type.
+            </summary>
+            <param name="start">The start value of the range.</param>
+            <param name="end">The end value of the range.</param>
+            <param name="type">The type of the range.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="start"/> or <paramref name="end"/> is <see langword="null"/>.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when <paramref name="start"/> exceeds <paramref name="end"/>, or when <paramref name="type"/> is not a defined <see cref="T:MyOrg.Elements.RangeType"/>.</exception>
+            <exception cref="T:System.InvalidOperationException">Thrown when start and end are equal and <paramref name="type"/> is not <see cref="F:MyOrg.Elements.RangeType.Inclusive"/>.</exception>
+            <example>
+            <code language="csharp">
+            var halfOpen = new Range&lt;int&gt;(1, 10, RangeType.ExclusiveEnd);
+            bool atEnd = halfOpen.IsInRange(10); // false — end is excluded
+            bool beforeEnd = halfOpen.IsInRange(9); // true
+            </code>
+            </example>
+        </member>
+        <member name="P:MyOrg.Elements.Range`1.Start">
+            <summary>Gets the start value of the range.</summary>
+        </member>
+        <member name="P:MyOrg.Elements.Range`1.End">
+            <summary>Gets the end value of the range.</summary>
+        </member>
+        <member name="P:MyOrg.Elements.Range`1.Type">
+            <summary>Gets the type of the range.</summary>
+        </member>
+        <member name="M:MyOrg.Elements.Range`1.IsInRange(`0)">
+            <summary>
+            Indicates whether the specified value is within the range, based on the range type.
+            </summary>
+            <param name="value">The value to test.</param>
+            <returns><see langword="true"/> if the value is within the range; otherwise <see langword="false"/>.</returns>
+            <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="value"/> is <see langword="null"/>.</exception>
+            <example>
+            <code language="csharp">
+            var range = new Range&lt;int&gt;(1, 10);
+            bool atStart = range.IsInRange(1);  // true
+            bool atEnd   = range.IsInRange(10); // true
+            bool outside = range.IsInRange(11); // false
+            </code>
+            </example>
+        </member>
+        <member name="T:MyOrg.Elements.RangeType">
+             <summary>
+             Specifies the type of the range.
+             </summary>
+             <example>
+             <code language="csharp">
+             var inclusive = new Range&lt;int&gt;(1, 10, RangeType.Inclusive);
+             inclusive.IsInRange(1);  // true
+             inclusive.IsInRange(10); // true
+            
+             var exclusive = new Range&lt;int&gt;(1, 10, RangeType.Exclusive);
+             exclusive.IsInRange(1);  // false
+             exclusive.IsInRange(10); // false
+             </code>
+             </example>
+        </member>
+        <member name="F:MyOrg.Elements.RangeType.Inclusive">
+            <summary>
+            The range includes both the start and end values.
+            </summary>
+        </member>
+        <member name="F:MyOrg.Elements.RangeType.Exclusive">
+            <summary>
+            The range excludes both the start and end values.
+            </summary>
+        </member>
+        <member name="F:MyOrg.Elements.RangeType.ExclusiveStart">
+            <summary>
+            The range excludes the start value but includes the end value.
+            </summary>
+        </member>
+        <member name="F:MyOrg.Elements.RangeType.ExclusiveEnd">
+            <summary>
+            The range includes the start value but excludes the end value.
+            </summary>
+        </member>
+        <member name="T:MyOrg.Elements.Results.Errors.Error">
+             <summary>
+             Represents an error that occurred during an operation, including details about the error code, message, and type.
+             </summary>
+             <remarks>
+             This class is typically used to encapsulate error information in scenarios where operations may fail and detailed
+             error reporting is required. It provides a standardized way to convey error details such as a unique error code,
+             a human-readable message, and the category of the error.
+             </remarks>
+             <example>
+             <code language="csharp">
+             public sealed class TimeoutError : Error
+             {
+                 public TimeoutError(TimeSpan elapsed)
+                 {
+                     Code = "TIMEOUT";
+                     Message = $"Operation timed out after {elapsed.TotalSeconds:F1}s.";
+                 }
+             }
+            
+             Result result = Result.Failure(new TimeoutError(TimeSpan.FromSeconds(30)));
+             </code>
+             </example>
+        </member>
+        <member name="P:MyOrg.Elements.Results.Errors.Error.Code">
+            <summary>
+            Gets or sets the error code associated with the error.
+            </summary>
+        </member>
+        <member name="P:MyOrg.Elements.Results.Errors.Error.Message">
+            <summary>
+            Gets or sets the message associated with the current operation.
+            </summary>
+        </member>
+        <member name="P:MyOrg.Elements.Results.Errors.Error.Exceptions">
+            <summary>
+            Gets the collection of exceptions that have occurred.
+            </summary>
+            <remarks>
+            This property can be used to store and retrieve multiple exceptions that may have been encountered
+            during an operation.
+            </remarks>
+        </member>
+        <member name="T:MyOrg.Elements.Results.Errors.RuntimeExceptionError">
+            <summary>
+            Represents an error that occurs due to an unhandled runtime exception.
+            </summary>
+            <remarks>
+            This error is typically used to encapsulate runtime exceptions that occur during the
+            execution of an application. The <see cref="T:System.Exception"/> instance associated with the runtime error is included
+            in the <see cref="!:Exceptions"/> collection.
+            </remarks>
+            <example>
+            <code language="csharp">
+            try { /* call third-party API */ }
+            catch (Exception ex)
+            {
+                return Result.Failure(new RuntimeExceptionError(ex));
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Results.Errors.RuntimeExceptionError.#ctor(System.Exception)">
+            <summary>
+            Creates a new instance of the <see cref="T:MyOrg.Elements.Results.Errors.RuntimeExceptionError"/> class.
+            </summary>
+            <param name="exception">The exception that was encountered.</param>
+            <example>
+            <code language="csharp">
+            var error = new RuntimeExceptionError(caughtException);
+            </code>
+            </example>
+        </member>
+        <member name="T:MyOrg.Elements.Results.Errors.ValidationError">
+            <summary>
+            Represents an error that occurs when a validation rule is violated.
+            </summary>
+            <remarks>
+            This class provides details about the specific property that failed validation,
+            the attempted value that caused the failure, and a descriptive error message.
+            </remarks>
+            <example>
+            <code language="csharp">
+            var error = new ValidationError(
+                propertyName: nameof(Order.Quantity),
+                message: "Quantity must be greater than zero.",
+                attemptedValue: "-1");
+            Result result = Result.Failure(error);
+            </code>
+            </example>
+        </member>
+        <member name="P:MyOrg.Elements.Results.Errors.ValidationError.PropertyName">
+            <summary>
+            Gets the name of the property that failed validation.
+            </summary>
+        </member>
+        <member name="P:MyOrg.Elements.Results.Errors.ValidationError.AttemptedValue">
+            <summary>
+            Gets the value that was attempted during the operation.
+            </summary>
+        </member>
+        <member name="M:MyOrg.Elements.Results.Errors.ValidationError.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Represents an error that occurs during validation of a specific property.
+            </summary>
+            <param name="propertyName">The name of the property that caused the validation error.</param>
+            <param name="message">A message describing the validation error.</param>
+            <param name="attemptedValue">The value that was attempted to be set on the property, which caused the validation error.</param>
+            <example>
+            <code language="csharp">
+            var error = new ValidationError(nameof(Order.Quantity), "Must be positive.", "-1");
+            </code>
+            </example>
+        </member>
+        <member name="T:MyOrg.Elements.Results.Result">
+             <summary>
+             Represents the outcome of an operation that may either succeed or carry structured errors.
+             </summary>
+             <remarks>
+             <para>
+             The Result pattern is preferred over exception-based control flow for expected, recoverable
+             failure paths — for example, a resource that does not exist, a validation rule that is
+             violated, or a concurrency conflict on write. Exceptions remain appropriate for truly
+             exceptional, programmer-error conditions (null dereferences, argument violations, etc.);
+             the Result pattern covers the space where throwing would be an abuse of the exception
+             mechanism.
+             </para>
+             <para>
+             Benefits over <c>try</c>/<c>catch</c> for business logic:
+             <list type="bullet">
+               <item><description>
+                 <b>Explicit contracts.</b> The signature <c>Result&lt;Order&gt;</c> immediately communicates
+                 that the operation can fail in a structured way, whereas a throwing method forces callers
+                 to read documentation or source code to discover which exceptions to handle.
+               </description></item>
+               <item><description>
+                 <b>No silent swallowing.</b> A caller that ignores errors is visible — it discards a
+                 <see cref="T:MyOrg.Elements.Results.Result"/> without inspecting <see cref="P:MyOrg.Elements.Results.Result.Errors"/>. A caller that swallows an
+                 exception is invisible until production.
+               </description></item>
+               <item><description>
+                 <b>Multiple errors.</b> Validation routines can accumulate all field errors into a single
+                 <see cref="T:MyOrg.Elements.Results.Result"/> rather than throwing on the first violation and leaving the caller
+                 with incomplete feedback.
+               </description></item>
+               <item><description>
+                 <b>Composability.</b> Pipelines and behaviors can inspect, transform, or propagate results
+                 without catching and re-throwing, keeping control flow linear and easy to reason about.
+               </description></item>
+             </list>
+             </para>
+             <para>
+             For operations that return a value on success, use the generic <see cref="T:MyOrg.Elements.Results.Result`1"/>
+             subclass. The non-generic <c>Result</c> is appropriate for void-style operations
+             (e.g., a delete command) where only the success/failure outcome matters.
+             </para>
+             </remarks>
+             <example>
+             <code language="csharp">
+             // Void operation — only success/failure matters.
+             Result ok = Result.Success();
+             Result bad = Result.Failure(new NotFoundError("Order not found."));
+            
+             if (bad.IsFailure())
+             {
+                 foreach (var error in bad.Errors)
+                     logger.LogWarning("{Code}: {Message}", error.Code, error.Message);
+             }
+            
+             // Typical handler that avoids try/catch for expected failures.
+             public Result DeleteOrder(Guid id)
+             {
+                 var order = _repository.Find(id);
+                 if (order is null)
+                     return Result.Failure(new NotFoundError($"Order {id} not found."));
+            
+                 _repository.Delete(order);
+                 return Result.Success();
+             }
+             </code>
+             </example>
+             <seealso href="https://martinfowler.com/eaaDev/Notification.html">Martin Fowler — Notification pattern</seealso>
+             <seealso href="https://martinfowler.com/articles/replaceThrowWithNotification.html">Martin Fowler — Replacing Throwing Exceptions with Notification in Validations</seealso>
+        </member>
+        <member name="M:MyOrg.Elements.Results.Result.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:MyOrg.Elements.Results.Result"/> class.
+            </summary>
+        </member>
+        <member name="M:MyOrg.Elements.Results.Result.#ctor(System.Collections.Generic.ICollection{MyOrg.Elements.Results.Errors.Error})">
+            <summary>
+            Initializes a new instance of the <see cref="T:MyOrg.Elements.Results.Result"/> class with a collection of errors.
+            </summary>
+            <param name="errors">The collection of errors associated with the result.</param>
+            <example>
+            <code language="csharp">
+            var result = new Result(new[] { new Error { Code = "NOT_FOUND", Message = "Order not found." } });
+            </code>
+            </example>
+        </member>
+        <member name="P:MyOrg.Elements.Results.Result.Errors">
+            <summary>
+            Gets or sets the collection of errors associated with the current operation or context.
+            </summary>
+            <remarks>Use this property to access or modify the list of errors. Adding or removing items
+            from the collection allows tracking of errors relevant to the operation or context.</remarks>
+        </member>
+        <member name="M:MyOrg.Elements.Results.Result.IsSuccess">
+            <summary>
+            Determines whether the operation completed successfully.
+            </summary>
+            <returns><see langword="true"/> if there are no errors; otherwise, <see langword="false"/>.</returns>
+            <remarks>Implementors may override this behavior to provide custom success logic.</remarks>
+            <example>
+            <code>
+            var result = new Result();
+            if (result.IsSuccess()) {
+                // Handle success
+            }
+            </code>
+            </example>
+            <example>
+            <code>
+            public class MyCustomResult : Result
+            {
+             public override bool IsSuccess() {
+                 return Errors.Count == 0 || Errors.Contains(e => e.GetType() != typeof(MyErrorThatCanBeIgnored));
+             }
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Results.Result.IsFailure">
+            <summary>
+            Determines whether the operation failed.
+            </summary>
+            <returns><see langword="true"/> if there are any errors; otherwise, <see langword="false"/>.</returns>
+            <remarks>Implementors may override this behavior to provide custom failure logic.</remarks>
+            <example>
+            <code>
+            var result = new Result();
+            if (result.IsFailure()) {
+                // Handle failure
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Results.Result.Success">
+            <summary>
+            Creates a successful result with no errors.
+            </summary>
+            <returns>A successful <see cref="T:MyOrg.Elements.Results.Result"/> instance.</returns>
+            <example>
+            <code language="csharp">
+            Result result = Result.Success();
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Results.Result.Failure(MyOrg.Elements.Results.Errors.Error)">
+            <summary>
+            Creates a failed result containing the specified error.
+            </summary>
+            <param name="error">The error to include in the result.</param>
+            <returns>A failed <see cref="T:MyOrg.Elements.Results.Result"/> containing the supplied error.</returns>
+            <example>
+            <code language="csharp">
+            Result result = Result.Failure(new NotFoundError("Order not found."));
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Results.Result.CreateFailure``1(MyOrg.Elements.Results.Errors.Error[])">
+            <summary>
+            Creates a failure result of a specific derived Result type.
+            </summary>
+            <typeparam name="TResult">The specific Result type to create (must have a parameterless constructor).</typeparam>
+            <param name="errors">The errors to include in the failure result.</param>
+            <returns>A failure result of the specified type.</returns>
+            <remarks>
+            This method enables behaviors to construct failure results without reflection.
+            Use this when you need to return a specific Result-derived type (e.g., Result&lt;T&gt;, QueryResult&lt;T&gt;).
+            </remarks>
+            <example>
+            <code language="csharp">
+            var failure = Result.CreateFailure&lt;Result&lt;Order&gt;&gt;(new NotFoundError("Order not found."));
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Results.Result.CreateFailure``1(System.Collections.Generic.IEnumerable{MyOrg.Elements.Results.Errors.Error})">
+            <summary>
+            Creates a failure result of a specific derived Result type with a collection of errors.
+            </summary>
+            <typeparam name="TResult">The specific Result type to create (must have a parameterless constructor).</typeparam>
+            <param name="errors">The errors to include in the failure result.</param>
+            <returns>A failure result of the specified type.</returns>
+            <example>
+            <code language="csharp">
+            IEnumerable&lt;Error&gt; errors = validator.Validate(command);
+            var failure = Result.CreateFailure&lt;Result&lt;Order&gt;&gt;(errors);
+            </code>
+            </example>
+        </member>
+        <member name="T:MyOrg.Elements.Results.Result`1">
+             <summary>
+             Represents the outcome of an operation that returns a value on success.
+             </summary>
+             <typeparam name="T">The type of value carried when the operation succeeds.</typeparam>
+             <remarks>
+             <para>
+             Use <c>Result&lt;T&gt;</c> in place of returning a bare model value or throwing an exception
+             when the operation may fail for an expected reason. Returning a plain model (or <see langword="null"/>)
+             forces callers to infer failure from a sentinel value; returning <c>Result&lt;T&gt;</c> makes the
+             possibility of failure explicit in the method signature and provides structured error information
+             without the overhead or control-flow disruption of exception handling.
+             </para>
+             <para>
+             Prefer <c>Result&lt;T&gt;</c> over raw model returns when:
+             <list type="bullet">
+               <item><description>
+                 The operation may legitimately not find a resource (<see cref="!:Errors.NotFoundError"/>,
+                 <see cref="!:Errors.ResourceNotFoundError"/>).
+               </description></item>
+               <item><description>
+                 Input validation may reject the request before any work is done
+                 (<see cref="T:MyOrg.Elements.Results.Errors.ValidationError"/>).
+               </description></item>
+               <item><description>
+                 A caller needs to distinguish between a successful empty value and a failure
+                 (which a <see langword="null"/> return cannot express).
+               </description></item>
+             </list>
+             </para>
+             <para>
+             See <see cref="T:MyOrg.Elements.Results.Result"/> for the rationale behind preferring the Result pattern over
+             <c>try</c>/<c>catch</c> for expected failure paths.
+             </para>
+             </remarks>
+             <example>
+             <code language="csharp">
+             // Handler that returns a value without throwing for expected failures.
+             public Result&lt;Order&gt; GetOrder(Guid id)
+             {
+                 var order = _repository.Find(id);
+                 if (order is null)
+                     return Result&lt;Order&gt;.Failure(new NotFoundError($"Order {id} not found."));
+            
+                 return Result&lt;Order&gt;.Success(order);
+             }
+            
+             // Caller inspects the outcome without a try/catch.
+             var result = GetOrder(id);
+             if (result.IsSuccess())
+                 Process(result.Value!);
+             else
+                 foreach (var error in result.Errors)
+                     logger.LogWarning("{Code}: {Message}", error.Code, error.Message);
+             </code>
+             </example>
+             <seealso href="https://martinfowler.com/eaaDev/Notification.html">Martin Fowler — Notification pattern</seealso>
+             <seealso href="https://martinfowler.com/articles/replaceThrowWithNotification.html">Martin Fowler — Replacing Throwing Exceptions with Notification in Validations</seealso>
+        </member>
+        <member name="M:MyOrg.Elements.Results.Result`1.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:MyOrg.Elements.Results.Result`1"/> class.
+            Required for <see cref="M:MyOrg.Elements.Results.Result.CreateFailure``1(MyOrg.Elements.Results.Errors.Error[])"/> compatibility.
+            </summary>
+        </member>
+        <member name="M:MyOrg.Elements.Results.Result`1.#ctor(`0)">
+            <summary>
+            Initializes a new instance of the <see cref="T:MyOrg.Elements.Results.Result`1"/> class with a value.
+            </summary>
+            <param name="value">The value to carry on success.</param>
+            <example>
+            <code language="csharp">
+            var result = new Result&lt;Order&gt;(order);
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Results.Result`1.#ctor(`0,System.Collections.Generic.ICollection{MyOrg.Elements.Results.Errors.Error})">
+            <summary>
+            Initializes a new instance of the <see cref="T:MyOrg.Elements.Results.Result`1"/> class with a value and errors.
+            </summary>
+            <param name="value">The value to carry.</param>
+            <param name="errors">The collection of errors associated with the result.</param>
+            <example>
+            <code language="csharp">
+            var result = new Result&lt;Order&gt;(null, new[] { new Error { Code = "NOT_FOUND", Message = "Order not found." } });
+            </code>
+            </example>
+        </member>
+        <member name="P:MyOrg.Elements.Results.Result`1.Value">
+            <summary>
+            Gets the value carried by the result.
+            </summary>
+        </member>
+        <member name="M:MyOrg.Elements.Results.Result`1.Success(`0)">
+            <summary>
+            Creates a successful result with a value.
+            </summary>
+            <param name="value">The value to carry.</param>
+            <returns>A successful result containing the value.</returns>
+            <example>
+            <code language="csharp">
+            Result&lt;Order&gt; ok = Result&lt;Order&gt;.Success(order);
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Results.Result`1.Failure(MyOrg.Elements.Results.Errors.Error)">
+            <inheritdoc cref="M:MyOrg.Elements.Results.Result.Failure(MyOrg.Elements.Results.Errors.Error)"/>
+        </member>
+        <member name="M:MyOrg.Elements.Results.Result`1.Failure(System.Collections.Generic.ICollection{MyOrg.Elements.Results.Errors.Error})">
+            <summary>
+            Creates a failed result with multiple errors.
+            </summary>
+            <param name="errors">The collection of errors to include in the result.</param>
+            <returns>A failed result containing the errors.</returns>
+            <example>
+            <code language="csharp">
+            var bad = Result&lt;Order&gt;.Failure(new[] { new ValidationError("Id", "Required.", "") });
+            </code>
+            </example>
+        </member>
+        <member name="T:MyOrg.Elements.SystemClock">
+             <summary>
+             Default <see cref="T:MyOrg.Elements.IClock"/> implementation that delegates to <see cref="P:System.DateTime.UtcNow"/>
+             and <see cref="P:System.DateTimeOffset.UtcNow"/>.
+             </summary>
+             <example>
+             <code language="csharp">
+             // Register as the clock for production code by passing SystemClock
+             // as the generic type argument:
+             var service = new OrderService&lt;SystemClock&gt;();
+            
+             // Retrieve current UTC time directly:
+             DateTime now = SystemClock.UtcNow;
+             DateTimeOffset nowOffset = SystemClock.UtcNowOffset;
+             </code>
+             </example>
+        </member>
+        <member name="P:MyOrg.Elements.SystemClock.UtcNow">
+            <inheritdoc cref="P:MyOrg.Elements.IClock.UtcNow"/>
+        </member>
+        <member name="P:MyOrg.Elements.SystemClock.UtcNowOffset">
+            <inheritdoc cref="P:MyOrg.Elements.IClock.UtcNowOffset"/>
+        </member>
+        <member name="T:MyOrg.Elements.Validation.IValidationService">
+             <summary>
+             Provides the interface for validation services. Validation services
+             are responsible for validating objects and returning the results of
+             the validation.
+             </summary>
+             <remarks>
+             Validation results should be preferred over throwing exceptions for
+             issues with validation. This allows for a more graceful handling of
+             validation errors, especially in scenarios where multiple validations
+             need to be performed at once. Additionally, this adheres to the general
+             principal of allowing exceptions to be thrown only for truly exceptional
+             cases, rather than for validation errors, which are expected and
+             manageable.
+             </remarks>
+             <example>
+             <code language="csharp">
+             IValidationService validator = serviceProvider.GetRequiredService&lt;IValidationService&gt;();
+            
+             var customer = new Customer { Name = string.Empty, Email = "not-an-email" };
+             ValidationResult result = await validator.Validate(customer);
+            
+             if (!result.IsValid())
+             {
+                 foreach (ValidationError error in result.Errors)
+                 {
+                     logger.LogWarning("{Property}: {Message}", error.PropertyName, error.ErrorMessage);
+                 }
+             }
+             </code>
+             </example>
+        </member>
+        <member name="M:MyOrg.Elements.Validation.IValidationService.Validate``1(``0)">
+            <summary>
+            Validates the specified object and returns a ValidationResult.
+            </summary>
+            <typeparam name="T">The type of the object to validate.</typeparam>
+            <param name="objectToValidate">The object to validate.</param>
+            <returns>A <see cref="T:MyOrg.Elements.Validation.ValidationResult"/> containing any validation errors that were detected.</returns>
+            <example>
+            <code language="csharp">
+            ValidationResult result = await validator.Validate(orderRequest);
+            if (!result.IsValid())
+            {
+                return Results.BadRequest(result.Errors);
+            }
+            </code>
+            </example>
+        </member>
+        <member name="T:MyOrg.Elements.Validation.ValidationError">
+             <summary>
+             Represents a validation error that occurs during the validation process.
+             </summary>
+             <param name="errorMessage">The error message describing the validation error.</param>
+             <param name="propertyName">The name of the property that caused the validation error, if applicable.</param>
+             <param name="errorCode">An optional error code associated with the validation error.</param>
+             <example>
+             <code language="csharp">
+             var error = new ValidationError(
+                 errorMessage: "Email address is required.",
+                 propertyName: nameof(Customer.Email),
+                 errorCode: "REQUIRED")
+             {
+                 AttemptedValue = customer.Email,
+             };
+            
+             logger.LogWarning("{Property} ({Code}): {Message}",
+                 error.PropertyName, error.ErrorCode, error.ErrorMessage);
+             </code>
+             </example>
+        </member>
+        <member name="M:MyOrg.Elements.Validation.ValidationError.#ctor(System.String,System.String,System.String)">
+             <summary>
+             Represents a validation error that occurs during the validation process.
+             </summary>
+             <param name="errorMessage">The error message describing the validation error.</param>
+             <param name="propertyName">The name of the property that caused the validation error, if applicable.</param>
+             <param name="errorCode">An optional error code associated with the validation error.</param>
+             <example>
+             <code language="csharp">
+             var error = new ValidationError(
+                 errorMessage: "Email address is required.",
+                 propertyName: nameof(Customer.Email),
+                 errorCode: "REQUIRED")
+             {
+                 AttemptedValue = customer.Email,
+             };
+            
+             logger.LogWarning("{Property} ({Code}): {Message}",
+                 error.PropertyName, error.ErrorCode, error.ErrorMessage);
+             </code>
+             </example>
+        </member>
+        <member name="P:MyOrg.Elements.Validation.ValidationError.PropertyName">
+            <summary>
+            The name of the property that caused the validation error, if applicable.
+            </summary>
+        </member>
+        <member name="P:MyOrg.Elements.Validation.ValidationError.ErrorMessage">
+            <summary>
+            The error message describing the validation error.
+            </summary>
+        </member>
+        <member name="P:MyOrg.Elements.Validation.ValidationError.ErrorCode">
+            <summary>
+            The optional error code associated with the validation error.
+            </summary>
+        </member>
+        <member name="P:MyOrg.Elements.Validation.ValidationError.AttemptedValue">
+            <summary>
+            The value that was attempted to be set, if applicable.
+            </summary>
+        </member>
+        <member name="T:MyOrg.Elements.Validation.ValidationResult">
+             <summary>
+             Represents the result of a validation operation, including any validation errors that occurred.
+             </summary>
+             <example>
+             <code language="csharp">
+             var result = new ValidationResult();
+            
+             if (string.IsNullOrWhiteSpace(customer.Email))
+             {
+                 result.AddError("Email is required.", nameof(customer.Email), "REQUIRED");
+             }
+            
+             if (result.IsValid())
+             {
+                 await repository.SaveAsync(customer);
+             }
+             </code>
+             </example>
+        </member>
+        <member name="P:MyOrg.Elements.Validation.ValidationResult.Errors">
+            <summary>
+            The collection of validation errors that occurred during the validation process.
+            </summary>
+            <example>
+            <code language="csharp">
+            ValidationResult result = await validator.Validate(order);
+            foreach (ValidationError error in result.Errors)
+            {
+                logger.LogWarning("{Property}: {Message}", error.PropertyName, error.ErrorMessage);
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Validation.ValidationResult.AddError(MyOrg.Elements.Validation.ValidationError)">
+            <summary>
+            Adds a validation error to the result.
+            </summary>
+            <param name="error">The validation error to add.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when error is null.</exception>
+            <example>
+            <code language="csharp">
+            var result = new ValidationResult();
+            result.AddError(new ValidationError("Name is required.", nameof(Customer.Name), "REQUIRED"));
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Validation.ValidationResult.AddError(System.String,System.String,System.String)">
+            <summary>
+            Adds a validation error to the result.
+            </summary>
+            <param name="errorMessage">The error message.</param>
+            <param name="propertyName">The property name that caused the error.</param>
+            <param name="errorCode">An optional error code.</param>
+            <exception cref="T:System.ArgumentNullException">Thrown when errorMessage is null.</exception>
+            <example>
+            <code language="csharp">
+            var result = new ValidationResult();
+            result.AddError("Email is required.", nameof(Customer.Email), "REQUIRED");
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.Validation.ValidationResult.IsValid">
+            <summary>
+            Indicates whether the validation was successful (i.e., no errors were found).
+            </summary>
+            <returns>Returns <c>true</c> if the result indicates a successful validation (no errors) or <c>false</c> if the validation failed.</returns>
+            <example>
+            <code language="csharp">
+            ValidationResult result = await validator.Validate(customer);
+            if (!result.IsValid())
+            {
+                return Results.BadRequest(result.Errors);
+            }
+            </code>
+            </example>
+        </member>
+        <member name="T:MyOrg.Elements.ValueObject">
+            <summary>
+            Base class for value objects. Value objects are compared by their structural attributes,
+            not by identity. They should be immutable.
+            </summary>
+            <remarks>
+            Subclasses must override <see cref="M:MyOrg.Elements.ValueObject.GetEqualityComponents"/> to enumerate all properties
+            that participate in equality comparison. Two value objects are equal if and only if they
+            have the same type and their equality components are sequence-equal.
+            </remarks>
+            <example>
+            <code language="csharp">
+            public sealed class Money : ValueObject
+            {
+                public decimal Amount { get; }
+                public string Currency { get; }
+                public Money(decimal amount, string currency) { Amount = amount; Currency = currency; }
+                protected override IEnumerable&lt;object?&gt; GetEqualityComponents()
+                {
+                    yield return Amount;
+                    yield return Currency;
+                }
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.ValueObject.GetEqualityComponents">
+            <summary>
+            Gets the components used for equality comparison.
+            </summary>
+            <returns>An enumerable of property values that define this value object's identity.</returns>
+            <example>
+            <code language="csharp">
+            protected override IEnumerable&lt;object?&gt; GetEqualityComponents()
+            {
+                yield return Amount;
+                yield return Currency;
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.ValueObject.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:MyOrg.Elements.ValueObject.Equals(MyOrg.Elements.ValueObject)">
+            <summary>
+            Determines whether this value object equals another value object by comparing equality components.
+            </summary>
+            <param name="other">The value object to compare to.</param>
+            <returns><c>true</c> if both objects have the same type and equal equality components; otherwise <c>false</c>.</returns>
+            <example>
+            <code language="csharp">
+            var a = new Money(10m, "USD");
+            var b = new Money(10m, "USD");
+            bool equal = a.Equals(b); // true
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.ValueObject.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:MyOrg.Elements.ValueObject.op_Equality(MyOrg.Elements.ValueObject,MyOrg.Elements.ValueObject)">
+            <summary>
+            Determines whether two value objects are equal.
+            </summary>
+            <param name="left">The left value object.</param>
+            <param name="right">The right value object.</param>
+            <returns><c>true</c> if the two values are equal; otherwise <c>false</c>.</returns>
+            <example>
+            <code language="csharp">
+            var a = new Money(10m, "USD");
+            var b = new Money(10m, "USD");
+            bool equal = a == b; // true
+            </code>
+            </example>
+        </member>
+        <member name="M:MyOrg.Elements.ValueObject.op_Inequality(MyOrg.Elements.ValueObject,MyOrg.Elements.ValueObject)">
+            <summary>
+            Determines whether two value objects are not equal.
+            </summary>
+            <param name="left">The left value object.</param>
+            <param name="right">The right value object.</param>
+            <returns><c>true</c> if the two values differ; otherwise <c>false</c>.</returns>
+            <example>
+            <code language="csharp">
+            var a = new Money(10m, "USD");
+            var b = new Money(20m, "USD");
+            bool different = a != b; // true
+            </code>
+            </example>
+        </member>
+    </members>
+</doc>

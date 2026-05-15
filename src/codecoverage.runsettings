@@ -16,19 +16,21 @@
                 <ModulePath>.*System\..*\.dll$</ModulePath>
                 <ModulePath>.*netstandard\.dll$</ModulePath>
                 <ModulePath>.*mscorlib\.dll$</ModulePath>
-                
+
                 <!-- Third-party NuGet packages -->
                 <ModulePath>.*[\\/]FluentValidation\.dll$</ModulePath>
                 <ModulePath>.*[\\/]AutoMapper\.dll$</ModulePath>
                 <ModulePath>.*[\\/]Grpc\..*\.dll$</ModulePath>
                 <ModulePath>.*[\\/]Google\..*\.dll$</ModulePath>
-                
+                <ModulePath>.*[\\/]FakeItEasy\.dll$</ModulePath>
+                <ModulePath>.*[\\/]Castle\.Core\.dll$</ModulePath>
+
                 <!-- Test assemblies -->
                 <ModulePath>.*Tests\.Unit\.dll$</ModulePath>
                 <ModulePath>.*Tests\.Integration\.dll$</ModulePath>
               </Exclude>
             </ModulePaths>
-            
+
             <Attributes>
               <Exclude>
                 <Attribute>^System\.Diagnostics\.DebuggerHiddenAttribute$</Attribute>

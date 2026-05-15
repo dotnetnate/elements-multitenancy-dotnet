@@ -2,11 +2,13 @@
     "[csharp]": {
         "editor.defaultFormatter": "ms-dotnettools.csharp"
     },
-    "dotnet.solution.autoOpen": "src/MultiTenancy.sln",
+    "dotnet.solution.autoOpen": "src/Core.sln",
     "csharp.format.enable": true,
     "dotnet.enableWorkspaceBasedDevelopment": false,
     "dotnet.server.useOmnisharp": true,
+    "sonarlint.analysisExcludesStandalone": "**/*.Tests.*/**",
+    "editor.formatOnSave": true,    
     "omnisharp.enableEditorConfigSupport": true,
-    "omnisharp.useEditorFormattingSettings": true,
-    "sonarlint.analysisExcludesStandalone": "**/*Tests.*/**"
+    "omnisharp.useEditorFormattingSettings": false,     
+    "omnisharp.enableRoslynAnalyzers": true 
 }

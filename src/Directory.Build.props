@@ -9,9 +9,7 @@
 
   <PropertyGroup>
     <ElementsProductName>MultiTenancy</ElementsProductName>
-    <ElementsCoreReferenceMode Condition="'$(ElementsCoreReferenceMode)' == ''">Project</ElementsCoreReferenceMode>
-    <ElementsCoreRoot Condition="'$(ElementsCoreRoot)' == ''">$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\\..\\elements-core-dotnet\\src'))</ElementsCoreRoot>
-    <ElementsCorePackageVersion Condition="'$(ElementsCorePackageVersion)' == ''">0.1.*</ElementsCorePackageVersion>
+    <ElementsCorePackageVersion Condition="'$(ElementsCorePackageVersion)' == ''">0.1.0</ElementsCorePackageVersion>
 
     <!-- Unified versioning - all components can be overridden via command line or build agent -->
     <!-- Examples: 
@@ -19,40 +17,46 @@
          dotnet pack /p:Version=2.0.0
          dotnet pack /p:PackageVersionMetadata=release-12345
     -->
-    
+
     <!-- Assembly version components (defaults) -->
     <VersionMajor Condition="'$(VersionMajor)' == ''">0</VersionMajor>
     <VersionMinor Condition="'$(VersionMinor)' == ''">1</VersionMinor>
     <VersionPatch Condition="'$(VersionPatch)' == ''">0</VersionPatch>
-    
+
     <!-- Computed assembly version (can be overridden entirely) -->
     <Version Condition="'$(Version)' == ''">$(VersionMajor).$(VersionMinor).$(VersionPatch)</Version>
-    
+
     <!-- Package version metadata (defaults to dev-{timestamp}, can be overridden) -->
     <UnixEpochTicks Condition="'$(UnixEpochTicks)' == ''">621355968000000000</UnixEpochTicks>
-    <UnixTimestamp Condition="'$(UnixTimestamp)' == ''">$([MSBuild]::Divide($([MSBuild]::Subtract($([System.DateTime]::UtcNow.Ticks), $(UnixEpochTicks))), 10000000))</UnixTimestamp>
-    <PackageVersionMetadata Condition="'$(PackageVersionMetadata)' == ''">multitenancy-dev-$(UnixTimestamp)</PackageVersionMetadata>
-    
+    <UnixTimestamp Condition="'$(UnixTimestamp)' == ''">$([MSBuild]::Divide($([MSBuild]::Subtract($([System.DateTime]::UtcNow.Ticks),
+      $(UnixEpochTicks))), 10000000))</UnixTimestamp>
+    <PackageVersionMetadata Condition="'$(PackageVersionMetadata)' == ''">
+      multitenancy-dev-$(UnixTimestamp)</PackageVersionMetadata>
+
     <!-- NuGet package version (can be overridden entirely) -->
-    <PackageVersion Condition="'$(PackageVersion)' == ''">$(Version)+$(PackageVersionMetadata)</PackageVersion>
-    
+    <PackageVersion Condition="'$(PackageVersion)' == ''">$(Version)-$(PackageVersionMetadata)</PackageVersion>
+
     <!-- NuGet package metadata shared across all packable projects -->
     <Authors>MyOrg</Authors>
     <Company>MyOrg</Company>
     <Copyright>Copyright © MyOrg $([System.DateTime]::Now.Year)</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl Condition="'$(RepositoryUrl)' == ''">https://github.com/MyOrg/elements-multitenancy-dotnet</RepositoryUrl>
-    <PackageProjectUrl Condition="'$(PackageProjectUrl)' == ''">https://github.com/MyOrg/elements-multitenancy-dotnet</PackageProjectUrl>
+    <RepositoryUrl Condition="'$(RepositoryUrl)' == ''">
+      https://github.com/MyOrg/elements-multitenancy-dotnet</RepositoryUrl>
+    <PackageProjectUrl Condition="'$(PackageProjectUrl)' == ''">
+      https://github.com/MyOrg/elements-multitenancy-dotnet</PackageProjectUrl>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageTags Condition="'$(PackageTags)' == ''">elements;dotnet;multitenancy;saas</PackageTags>
-    <Description Condition="'$(Description)' == ''">$(MSBuildProjectName) — part of the Elements .NET toolkit (Multi-Tenancy).</Description>
+    <Description Condition="'$(Description)' == ''">$(MSBuildProjectName) — part of the Elements
+      .NET toolkit (Multi-Tenancy).</Description>
     <Product>Elements.MultiTenancy</Product>
 
-    <!-- All projects are packable by default; tests and exes are excluded in Directory.Build.targets -->
+    <!-- All projects are packable by default; tests and exes are excluded in
+    Directory.Build.targets -->
     <IsPackable>true</IsPackable>
 
     <!-- PackageReadmeFile is set dynamically in Directory.Build.targets during pack -->

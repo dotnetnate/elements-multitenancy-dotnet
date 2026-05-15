@@ -12,7 +12,7 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.7" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\elements-core-dotnet\src\Core\Elements.Core\Elements.Core.csproj" Condition="'$(ElementsCoreReferenceMode)' == 'Project'" />
-    <PackageReference Include="Elements.Core" Version="$(ElementsCorePackageVersion)" Condition="'$(ElementsCoreReferenceMode)' == 'Package'" />
+    <PackageReference Include="Elements.Core" Version="$(ElementsCorePackageVersion)"
+      ExcludeAssets="build" />
   </ItemGroup>
 </Project>

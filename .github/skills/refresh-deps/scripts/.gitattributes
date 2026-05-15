@@ -1,0 +1,2 @@
+# PowerShell scripts — CRLF on Windows, LF on macOS/Linux (pwsh handles both).
+*.ps1 text eol=crlf

@@ -9,7 +9,7 @@ Configures the local Git repository to use the shared hooks in `.githooks/`. Run
 **Usage:**
 
 ```powershell
-.\eng\setup-hooks.ps1
+.\eng\scripts\setup-hooks.ps1
 ```
 
 Or manually:

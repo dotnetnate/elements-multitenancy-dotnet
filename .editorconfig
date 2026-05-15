@@ -1,6 +1,8 @@
 # Remove the line below if you want to inherit .editorconfig settings from higher directories
 root = true
 
+
+
 # C# files
 [*.cs]
 
@@ -234,3 +236,15 @@ dotnet_naming_style.begins_with_i.capitalization = pascal_case
 # Enforce formatter and namespace style diagnostics so CLI/IDE actions apply consistently
 dotnet_diagnostic.IDE0055.severity = warning
 dotnet_diagnostic.IDE0161.severity = warning
+
+
+
+# Disable formatting for all files in a "Generated" folder
+[**/Generated/**.cs]
+
+generated_code = true
+
+# Disable formatting for all files with Generated in the name
+[**/*Generated*.cs]
+
+generated_code = true

@@ -5,9 +5,11 @@ using MyOrg.Elements.MultiTenancy.AspNet;
 namespace Elements.MultiTenancy.Extensions.AspNet.Tests.Unit;
 
 [TestClass]
-public class HeaderTenantResolutionStrategyTests {
+public class HeaderTenantResolutionStrategyTests
+{
     [TestMethod]
-    public async Task ResolveAsync_WithValidHeader_ReturnsTenantId() {
+    public async Task ResolveAsync_WithValidHeader_ReturnsTenantId()
+    {
         // Arrange
         var options = new MultiTenancyOptions { HeaderName = "X-Tenant-Id" };
         var strategy = new HeaderTenantResolutionStrategy(options);
@@ -22,7 +24,8 @@ public class HeaderTenantResolutionStrategyTests {
     }
 
     [TestMethod]
-    public async Task ResolveAsync_WithoutHeader_ReturnsNull() {
+    public async Task ResolveAsync_WithoutHeader_ReturnsNull()
+    {
         // Arrange
         var options = new MultiTenancyOptions { HeaderName = "X-Tenant-Id" };
         var strategy = new HeaderTenantResolutionStrategy(options);
@@ -36,12 +39,20 @@ public class HeaderTenantResolutionStrategyTests {
     }
 
     [TestMethod]
-    public void Priority_ReturnsExpectedValue() {
+    public void Priority_ReturnsExpectedValue()
+    {
         // Arrange
         var options = new MultiTenancyOptions();
         var strategy = new HeaderTenantResolutionStrategy(options);
 
         // Assert
         Assert.AreEqual(20, strategy.Priority);
+    }
+
+    [TestMethod]
+    public void Constructor_When_Options_Is_Null_Then_Throws()
+    {
+        // Act & Assert
+        Assert.ThrowsExactly<ArgumentNullException>(() => new HeaderTenantResolutionStrategy(null!));
     }
 }

@@ -1,0 +1,65 @@
+# ship-it skill preferences
+# This file is read (and may be updated) by the ship-it skill at runtime.
+# Allowed values are documented alongside each key.
+
+# mode — overall interaction style.
+#   interactive — prompt the user at decision points (default).
+#   auto        — choose the recommended option at every decision point.
+mode: interactive
+
+# pushOnCommit — whether to push to the remote after committing.
+#   ask — prompt the user each time.
+#   yes — always push without asking.
+#   no  — never push; keep commits local.
+pushOnCommit: yes
+
+# createPullRequest — whether a PR should be opened after a push.
+#   ask      — prompt the user.
+#   enabled  — always offer / create a PR when the current branch is not the default branch.
+#   disabled — never create a PR (suppresses all PR steps).
+createPullRequest: ask
+
+# linkIssues — whether to link issues in the commit footer (e.g. "Closes #123").
+#   ask — prompt for issue numbers when needed.
+#   yes — prompt for numbers and append them.
+#   no  — never prompt; never append.
+linkIssues: ask
+
+# buildBeforePush — whether to run the build gate prior to pushing.
+#   ask — prompt Yes / Yes+remember / No / No+remember.
+#   yes — always run.
+#   no  — always skip.
+buildBeforePush: ask
+
+# testBeforePush — whether to run the test gate prior to pushing.
+#   ask — prompt Yes / Yes+remember / No / No+remember.
+#   yes — always run.
+#   no  — always skip.
+testBeforePush: ask
+
+# splitUnrelatedChanges — how to handle a working tree that touches unrelated areas.
+#   interactive — propose groupings and ask Together / Split.
+#   auto        — split automatically when unrelated changes are detected.
+splitUnrelatedChanges: interactive
+
+# commitApproval — whether to show and confirm the drafted commit message.
+#   interactive — present the message and ask Accept / Edit / Regenerate.
+#   auto        — accept the drafted message immediately.
+commitApproval: interactive
+
+# branchNamingStrategy — how to name feature branches when the workflow
+# decides one is needed (root branch + PR requested + HEAD not unborn).
+#   system     — short opaque names derived from commit type + UTC timestamp
+#                or a short uuid (e.g. `feat-20260422-153045`). Best for
+#                trunk-based or GitHub Flow workflows with short-lived
+#                branches.
+#   meaningful — derive the name from the commit type, scope, and
+#                description; preserve whole words (never chop mid-word);
+#                drop trailing words if the name exceeds 60 characters
+#                (e.g. `feat-user-story-123`, `fix-auth-token-refresh`).
+#                Best for Git Flow or longer-lived branches.
+#   ask        — prompt the user on first use with System / Meaningful /
+#                System+remember / Meaningful+remember.
+# Auto-mode default when unset or `ask`: system (no semantic guessing
+# without user input).
+branchNamingStrategy: ask

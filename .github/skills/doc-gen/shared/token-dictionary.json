@@ -1,0 +1,57 @@
+{
+  "labels": {
+    "namespaceLabel":        { "dotnet": "Namespace",   "java": "Package",         "kotlin": "Package",       "typescript": "Module",             "javascript": "Module" },
+    "assemblyLabel":         { "dotnet": "Assembly",    "java": "Jar",             "kotlin": "Module",        "typescript": "Package",            "javascript": "Package" },
+    "typeLabel.class":       { "dotnet": "Class",       "java": "Class",           "kotlin": "Class",         "typescript": "Class",              "javascript": "Class" },
+    "typeLabel.interface":   { "dotnet": "Interface",   "java": "Interface",       "kotlin": "Interface",     "typescript": "Interface",          "javascript": "Interface" },
+    "typeLabel.struct":      { "dotnet": "Struct",      "java": "Class",           "kotlin": "Class",         "typescript": "Interface",          "javascript": "Object" },
+    "typeLabel.record":      { "dotnet": "Record",      "java": "Record",          "kotlin": "Data Class",    "typescript": "Interface",          "javascript": "Object" },
+    "typeLabel.enum":        { "dotnet": "Enum",        "java": "Enum",            "kotlin": "Enum",          "typescript": "Enum",               "javascript": "Object" },
+    "typeLabel.delegate":    { "dotnet": "Delegate",    "java": "Functional Interface", "kotlin": "Function Type", "typescript": "Function Type", "javascript": "Function" },
+
+    "memberLabel.method":        { "dotnet": "Method",       "java": "Method",       "kotlin": "Function",    "typescript": "Method",        "javascript": "Method" },
+    "memberLabel.property":      { "dotnet": "Property",     "java": "Property",     "kotlin": "Property",    "typescript": "Property",      "javascript": "Property" },
+    "memberLabel.field":         { "dotnet": "Field",        "java": "Field",        "kotlin": "Property",    "typescript": "Field",         "javascript": "Field" },
+    "memberLabel.event":         { "dotnet": "Event",        "java": "Event",        "kotlin": "Event",       "typescript": "Event",         "javascript": "Event" },
+    "memberLabel.operator":      { "dotnet": "Operator",     "java": "Operator",     "kotlin": "Operator",    "typescript": "Operator",      "javascript": "Operator" },
+    "memberLabel.constructor":   { "dotnet": "Constructor",  "java": "Constructor",  "kotlin": "Constructor", "typescript": "Constructor",   "javascript": "Constructor" },
+
+    "section.appliesTo":     { "dotnet": "Applies to",   "java": "Available since", "kotlin": "Available since", "typescript": "Available since", "javascript": "Available since" },
+    "section.threadSafety":  { "dotnet": "Thread Safety","java": "Thread Safety",   "kotlin": "Thread Safety",   "typescript": "",                "javascript": "" },
+    "section.remarks":       { "dotnet": "Remarks",      "java": "Details",         "kotlin": "Details",         "typescript": "Remarks",         "javascript": "Remarks" },
+
+    "heading.constructors":  { "dotnet": "Constructors", "java": "Constructors",    "kotlin": "Constructors",    "typescript": "Constructors",    "javascript": "Constructors" },
+    "heading.fields":        { "dotnet": "Fields",       "java": "Fields",          "kotlin": "Properties",      "typescript": "Fields",          "javascript": "Fields" },
+    "heading.properties":    { "dotnet": "Properties",   "java": "Properties",      "kotlin": "Properties",      "typescript": "Properties",      "javascript": "Properties" },
+    "heading.methods":       { "dotnet": "Methods",      "java": "Methods",         "kotlin": "Functions",       "typescript": "Methods",         "javascript": "Methods" },
+    "heading.events":        { "dotnet": "Events",       "java": "Events",          "kotlin": "Events",          "typescript": "Events",          "javascript": "Events" },
+    "heading.operators":     { "dotnet": "Operators",    "java": "Operators",       "kotlin": "Operators",       "typescript": "Operators",       "javascript": "Operators" },
+    "heading.extensionMethods": { "dotnet": "Extension Methods", "java": "", "kotlin": "Extension Functions", "typescript": "", "javascript": "" },
+    "heading.parameters":    { "dotnet": "Parameters",   "java": "Parameters",      "kotlin": "Parameters",      "typescript": "Parameters",      "javascript": "Parameters" },
+    "heading.typeParameters":{ "dotnet": "Type Parameters","java": "Type Parameters","kotlin": "Type Parameters","typescript": "Type Parameters","javascript": "Type Parameters" },
+    "heading.returns":       { "dotnet": "Returns",      "java": "Returns",         "kotlin": "Returns",         "typescript": "Returns",         "javascript": "Returns" },
+    "heading.exceptions":    { "dotnet": "Exceptions",   "java": "Throws",          "kotlin": "Throws",          "typescript": "Throws",          "javascript": "Throws" },
+    "heading.examples":      { "dotnet": "Examples",     "java": "Examples",        "kotlin": "Examples",        "typescript": "Examples",        "javascript": "Examples" },
+    "heading.seeAlso":       { "dotnet": "See also",     "java": "See also",        "kotlin": "See also",        "typescript": "See also",        "javascript": "See also" },
+    "heading.definition":    { "dotnet": "Definition",   "java": "Definition",      "kotlin": "Definition",      "typescript": "Definition",      "javascript": "Definition" },
+    "heading.inheritance":   { "dotnet": "Inheritance",  "java": "Inheritance",     "kotlin": "Inheritance",     "typescript": "Inheritance",     "javascript": "Inheritance" },
+    "heading.implements":    { "dotnet": "Implements",   "java": "Implements",      "kotlin": "Implements",      "typescript": "Implements",      "javascript": "Implements" },
+    "heading.derived":       { "dotnet": "Derived",      "java": "Known subclasses","kotlin": "Known subclasses","typescript": "Known subclasses","javascript": "Known subclasses" },
+
+    "heading.classes":       { "dotnet": "Classes",      "java": "Classes",         "kotlin": "Classes",         "typescript": "Classes",         "javascript": "Classes" },
+    "heading.interfaces":    { "dotnet": "Interfaces",   "java": "Interfaces",      "kotlin": "Interfaces",      "typescript": "Interfaces",      "javascript": "Interfaces" },
+    "heading.structs":       { "dotnet": "Structs",      "java": "Value Types",     "kotlin": "Value Classes",   "typescript": "Interfaces",      "javascript": "Objects" },
+    "heading.records":       { "dotnet": "Records",      "java": "Records",         "kotlin": "Data Classes",    "typescript": "Types",           "javascript": "Types" },
+    "heading.enums":         { "dotnet": "Enums",        "java": "Enums",           "kotlin": "Enums",           "typescript": "Enums",           "javascript": "Enums" },
+    "heading.delegates":     { "dotnet": "Delegates",    "java": "Functional Interfaces","kotlin": "Function Types","typescript": "Function Types","javascript": "Functions" },
+
+    "projectColumnLabel":    { "dotnet": "Project",      "java": "Module",          "kotlin": "Module",          "typescript": "Package",         "javascript": "Package" }
+  },
+  "codeLanguage": {
+    "dotnet": "csharp",
+    "java": "java",
+    "kotlin": "kotlin",
+    "typescript": "typescript",
+    "javascript": "javascript"
+  }
+}

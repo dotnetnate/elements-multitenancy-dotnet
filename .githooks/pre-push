@@ -1,23 +1,49 @@
 #!/bin/bash
-# pre-push hook: runs the full test suite before allowing a push.
+# pre-push hook: runs the unit test suite before allowing a push.
 # Install by running: git config core.hooksPath .githooks
-# Or run: eng/setup-hooks.ps1
+# Or run: eng/scripts/setup-hooks.ps1
+
+# Skip pre-push hooks for tag pushes, as they are often used for releases and may not require the same checks as regular code pushes.
+while read local_ref local_sha remote_ref remote_sha
+do
+    # Check if the reference is a tag
+    if echo "$remote_ref" | grep -q "refs/tags/"; then
+        echo "Tag push detected. Skipping pre-push hooks."
+        exit 0
+    fi
+done
 
 set -e
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
-SOLUTION="$REPO_ROOT/src/src.sln"
+SOLUTION="$REPO_ROOT/src/full-solution.slnx"
 
 echo ""
 echo "========================================"
-echo "  Pre-push hook: running test suite"
+echo "  Pre-push hook: checking formatting"
 echo "========================================"
 echo ""
 
-if ! dotnet test "$SOLUTION" --verbosity minimal; then
+if ! dotnet format "$SOLUTION" --verify-no-changes; then
     echo ""
     echo "========================================"
-    echo "  PUSH BLOCKED: tests failed."
+    echo "  PUSH BLOCKED: code is not properly formatted."
+    echo "  Fix the formatting issues (dotnet format) and try again."
+    echo "========================================"
+    echo ""
+    exit 1
+fi
+
+echo ""
+echo "========================================"
+echo "  Pre-push hook: running unit tests"
+echo "========================================"
+echo ""
+
+if ! pwsh -NoProfile -NonInteractive -File "$REPO_ROOT/eng/scripts/test-all.ps1" -TestTypes Unit; then
+    echo ""
+    echo "========================================"
+    echo "  PUSH BLOCKED: unit tests failed."
     echo "  Fix the failing tests and try again."
     echo "========================================"
     echo ""
@@ -26,7 +52,7 @@ fi
 
 echo ""
 echo "========================================"
-echo "  All tests passed. Push proceeding."
+echo "  All checks passed. Push proceeding."
 echo "========================================"
 echo ""
 exit 0

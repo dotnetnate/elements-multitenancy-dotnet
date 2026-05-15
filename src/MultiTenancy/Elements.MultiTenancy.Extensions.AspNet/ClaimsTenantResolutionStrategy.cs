@@ -19,7 +19,8 @@ namespace MyOrg.Elements.MultiTenancy.AspNet;
 /// // The strategy then runs as part of TenantResolutionMiddleware on every request.
 /// </code>
 /// </example>
-public sealed class ClaimsTenantResolutionStrategy : ITenantResolutionStrategy<HttpContext> {
+public sealed class ClaimsTenantResolutionStrategy : ITenantResolutionStrategy<HttpContext>
+{
     private readonly MultiTenancyOptions _options;
     private readonly WellKnownClaimsConfiguration _claimsConfig;
 
@@ -38,7 +39,8 @@ public sealed class ClaimsTenantResolutionStrategy : ITenantResolutionStrategy<H
     /// </example>
     public ClaimsTenantResolutionStrategy(
         MultiTenancyOptions options,
-        WellKnownClaimsConfiguration claimsConfig) {
+        WellKnownClaimsConfiguration claimsConfig)
+    {
         _options = options ?? throw new ArgumentNullException(nameof(options));
         _claimsConfig = claimsConfig ?? throw new ArgumentNullException(nameof(claimsConfig));
     }
@@ -47,18 +49,19 @@ public sealed class ClaimsTenantResolutionStrategy : ITenantResolutionStrategy<H
     public int Priority => 10;
 
     /// <inheritdoc/>
-    public Task<string?> ResolveAsync(HttpContext context) {
+    public Task<string?> ResolveAsync(HttpContext context)
+    {
         var user = context.User;
-        if (user?.Identity?.IsAuthenticated != true) {
+        if (user?.Identity?.IsAuthenticated != true)
+        {
             return Task.FromResult<string?>(null);
         }
 
         var claimType = _options.ClaimType ?? _claimsConfig.TenantId;
 
-        if (user.Identity is ClaimsIdentity identity) {
-            if (identity.TryGetClaimValue(claimType, out var tenantId)) {
-                return Task.FromResult<string?>(tenantId);
-            }
+        if (user.Identity is ClaimsIdentity identity && identity.TryGetClaimValue(claimType, out var tenantId))
+        {
+            return Task.FromResult<string?>(tenantId);
         }
 
         return Task.FromResult<string?>(null);

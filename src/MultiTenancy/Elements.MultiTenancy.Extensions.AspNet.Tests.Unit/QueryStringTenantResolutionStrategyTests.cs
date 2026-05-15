@@ -5,9 +5,11 @@ using MyOrg.Elements.MultiTenancy.AspNet;
 namespace Elements.MultiTenancy.Extensions.AspNet.Tests.Unit;
 
 [TestClass]
-public class QueryStringTenantResolutionStrategyTests {
+public class QueryStringTenantResolutionStrategyTests
+{
     [TestMethod]
-    public async Task ResolveAsync_WithValidQueryParameter_ReturnsTenantId() {
+    public async Task ResolveAsync_WithValidQueryParameter_ReturnsTenantId()
+    {
         // Arrange
         var options = new MultiTenancyOptions { QueryStringParameterName = "tenant" };
         var strategy = new QueryStringTenantResolutionStrategy(options);
@@ -22,7 +24,8 @@ public class QueryStringTenantResolutionStrategyTests {
     }
 
     [TestMethod]
-    public async Task ResolveAsync_WithoutQueryParameter_ReturnsNull() {
+    public async Task ResolveAsync_WithoutQueryParameter_ReturnsNull()
+    {
         // Arrange
         var options = new MultiTenancyOptions { QueryStringParameterName = "tenant" };
         var strategy = new QueryStringTenantResolutionStrategy(options);
@@ -36,7 +39,8 @@ public class QueryStringTenantResolutionStrategyTests {
     }
 
     [TestMethod]
-    public async Task ResolveAsync_WithCustomParameterName_UsesCustomName() {
+    public async Task ResolveAsync_WithCustomParameterName_UsesCustomName()
+    {
         // Arrange
         var options = new MultiTenancyOptions { QueryStringParameterName = "org" };
         var strategy = new QueryStringTenantResolutionStrategy(options);
@@ -51,12 +55,20 @@ public class QueryStringTenantResolutionStrategyTests {
     }
 
     [TestMethod]
-    public void Priority_Returns40() {
+    public void Priority_Returns40()
+    {
         // Arrange
         var options = new MultiTenancyOptions();
         var strategy = new QueryStringTenantResolutionStrategy(options);
 
         // Assert
         Assert.AreEqual(40, strategy.Priority);
+    }
+
+    [TestMethod]
+    public void Constructor_When_Options_Is_Null_Then_Throws()
+    {
+        // Act & Assert
+        Assert.ThrowsExactly<ArgumentNullException>(() => new QueryStringTenantResolutionStrategy(null!));
     }
 }

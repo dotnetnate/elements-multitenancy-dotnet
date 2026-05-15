@@ -1,0 +1,128 @@
+# Build, test, and report code quality
+# - Every push/PR: build → test → coverage → quality report (job summary + check run)
+# - Main branch only: deploy HTML report to GitHub Pages
+
+name: Continuous Integration
+
+on:
+  push:
+    branches: [ "main" ]
+    tags-ignore:
+          - '**'    
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: write        # push to gh-pages branch
+  checks: write          # publish-unit-test-result-action creates check runs
+  pull-requests: write   # publish-unit-test-result-action can comment on PRs
+
+env:
+  SOLUTION_ROOT: ./src
+  SOLUTION_FILE_NAME: full-solution.slnx
+  NUGET_FEED_NAME: github
+  NUGET_FEED_URL: https://nuget.pkg.github.com/dotnetnate/index.json
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 10.0.x
+        cache: true
+        cache-dependency-path: '**/*.csproj'
+
+    - name: Install reporting tools
+      run: dotnet tool install --global dotnet-coverage
+
+    - name: Configure Nuget feed
+      run: dotnet nuget add source --name ${{ env.NUGET_FEED_NAME }} ${{ env.NUGET_FEED_URL }}
+
+    - name: Restore dependencies
+      run: dotnet restore $SOLUTION_ROOT/$SOLUTION_FILE_NAME
+      env:
+        NuGetPackageSourceCredentials_${{ env.NUGET_FEED_NAME }}: Username=dotnetnate;Password=${{ secrets.PACKAGES_TOKEN }}      
+
+    - name: Build
+      run: |
+        dotnet build $SOLUTION_ROOT/$SOLUTION_FILE_NAME --no-restore -c Release \
+          /p:VersionPatch=${{ github.run_number }} \
+          /p:PackageVersionMetadata=ci-${{ github.sha }}
+
+    - name: Count Lines of Code (cloc)
+      uses: djdefi/cloc-action@6
+      with:
+        options: "--exclude-lang=YAML --md --report-file=cloc.md"
+
+    # ---------- Test + Coverage Collection ----------
+
+    - name: Test with coverage
+      run: |
+        mkdir -p ./test-results
+        # MTP mode requires each project to be run individually via --project.
+        # Collect per-project cobertura files and merge them afterwards.
+        COVERAGE_FILES=""
+        while IFS= read -r proj; do
+          proj_name=$(basename "$proj" .csproj)
+          cov_file="./test-results/${proj_name}.cobertura.xml"
+          dotnet-coverage collect \
+            --settings $SOLUTION_ROOT/codecoverage.runsettings \
+            --output-format cobertura \
+            --output "$cov_file" \
+            -- dotnet test \
+              --project "$proj" \
+              --no-build -c Release \
+              --report-trx \
+              --results-directory ./test-results \
+              --ignore-exit-code 8
+          COVERAGE_FILES="$COVERAGE_FILES $cov_file"
+        done < <(find $SOLUTION_ROOT -name "*.Tests.Unit.csproj")
+        # Merge all per-project coverage files into a single report.
+        dotnet-coverage merge \
+          --output-format cobertura \
+          --output ./test-results/coverage.cobertura.xml \
+          $COVERAGE_FILES
+
+    # ---------- Reports ----------
+
+    - name: Generate fancy report
+      if: always()
+      run: |
+        chmod +x ./eng/tools/fancy-reports/linux-x64/fancy-reports
+        ./eng/tools/fancy-reports/linux-x64/fancy-reports \
+          --reports "./test-results" \
+          -s "${{ env.SOLUTION_ROOT }}" \
+          -o "./fancy-report" \
+          -f markdown -f badge
+
+    - name: Write coverage summary to job
+      if: always()
+      run: |
+        if [ -f ./fancy-report/coverage.md ]; then
+          cat ./fancy-report/coverage.md >> $GITHUB_STEP_SUMMARY
+        else
+          echo "::warning::coverage.md not found — no coverage summary to write"
+        fi
+
+    - name: Publish test results
+      uses: EnricoMi/publish-unit-test-result-action/linux@v2
+      if: always()
+      with:
+        check_name: Test Results
+        files: ./test-results/**/*.trx
+
+    # ---------- Deploy Report to GitHub Pages (main only) ----------
+
+    - name: Deploy quality report to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./fancy-report
+        destination_dir: builds/${{ github.run_number }}/reports/code-coverage
+        keep_files: true
