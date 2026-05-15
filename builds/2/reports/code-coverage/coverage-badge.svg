@@ -1,0 +1,29 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="432" height="20" viewBox="0 0 432 20" role="img" aria-label="Coverage Report: line 100.0%, branch 100.0%, methods 57/57">
+  <title>Coverage Report: line 100.0%, branch 100.0%, methods 57/57</title>
+  <clipPath id="r"><rect width="432" height="20" rx="3" fill="#fff"/></clipPath>
+  <g clip-path="url(#r)">
+    <rect x="0" width="114" height="20" fill="#555"/>
+    <rect x="114" width="42" height="20" fill="#444"/>
+    <rect x="156" width="55" height="20" fill="#4c1"/>
+    <rect x="211" width="55" height="20" fill="#444"/>
+    <rect x="266" width="55" height="20" fill="#4c1"/>
+    <rect x="321" width="62" height="20" fill="#444"/>
+    <rect x="383" width="49" height="20" fill="#007ec6"/>
+  </g>
+  <g fill="#fff" text-anchor="middle" font-family="Verdana,DejaVu Sans,Geneva,sans-serif" font-size="11">
+    <text x="57" y="15" fill="#010101" fill-opacity=".3" aria-hidden="true">Coverage Report</text>
+    <text x="57" y="14">Coverage Report</text>
+    <text x="135" y="15" fill="#010101" fill-opacity=".3" aria-hidden="true">line</text>
+    <text x="135" y="14">line</text>
+    <text x="183" y="15" fill="#010101" fill-opacity=".3" aria-hidden="true">100.0%</text>
+    <text x="183" y="14">100.0%</text>
+    <text x="238" y="15" fill="#010101" fill-opacity=".3" aria-hidden="true">branch</text>
+    <text x="238" y="14">branch</text>
+    <text x="293" y="15" fill="#010101" fill-opacity=".3" aria-hidden="true">100.0%</text>
+    <text x="293" y="14">100.0%</text>
+    <text x="352" y="15" fill="#010101" fill-opacity=".3" aria-hidden="true">methods</text>
+    <text x="352" y="14">methods</text>
+    <text x="407" y="15" fill="#010101" fill-opacity=".3" aria-hidden="true">57/57</text>
+    <text x="407" y="14">57/57</text>
+  </g>
+</svg>
